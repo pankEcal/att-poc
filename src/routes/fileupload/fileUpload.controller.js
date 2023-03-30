@@ -42,6 +42,41 @@ async function makeHttpReq(uploadUrl) {
 	}
 }
 
+// make http POST request with uploaded file
+async function makePostReq(uploadUrl, csvfile) {
+	try {
+		const res = await axios({
+			method: "post",
+			url: uploadUrl,
+			data: {
+				"key 1": "val 1",
+				"key 2": "val 2",
+				"key 3": "val 3",
+			},
+		});
+
+		const {
+			status,
+			statusText,
+			headers: { date },
+			request: { method },
+			data,
+		} = res;
+
+		let responseData = {
+			statusCode: status,
+			statusMessage: statusText,
+			method: method,
+			date: date,
+			data: data,
+		};
+
+		return responseData;
+	} catch (error) {
+		console.log("error: ");
+	}
+}
+
 // main method to handle POST request
 function httpUploadFile(req, res) {
 	const isValid = isValidReqData(req);
@@ -53,7 +88,16 @@ function httpUploadFile(req, res) {
 		});
 	}
 
-	makeHttpReq(req.body.uploadUrl).then((response) => {
+	const {
+		body: { uploadUrl },
+		files: { csvfile },
+	} = req;
+
+	// makeHttpReq(req.body.uploadUrl).then((response) => {
+	// 	return res.status(200).json(response);
+	// });
+
+	makePostReq(uploadUrl, csvfile).then((response) => {
 		return res.status(200).json(response);
 	});
 }
