@@ -60,7 +60,7 @@ async function makePostReq(uploadUrl, csvfile) {
 			statusText,
 			headers: { date },
 			request: { method },
-			data,
+			data: { data },
 		} = res;
 
 		let responseData = {
