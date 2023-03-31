@@ -5,10 +5,10 @@ const {
 	httpUploadFile,
 } = require("../fileupload/fileUpload.controller");
 
-const fileUploadRoute = express.Router();
+const fileUploadRouter = express.Router();
 
-fileUploadRoute.get("/", httpGetRoutes);
+fileUploadRouter.get("/", httpGetRoutes);
 
-fileUploadRoute.post("/", httpUploadFile);
+fileUploadRouter.post("/", httpUploadFile);
 
-module.exports = fileUploadRoute;
+module.exports = fileUploadRouter;

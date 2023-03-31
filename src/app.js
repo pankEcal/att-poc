@@ -1,7 +1,8 @@
 const express = require("express");
 const expressFileUpload = require("express-fileupload");
 
-const fileUploadRoute = require("./routes/fileupload/fileUpload.router");
+const fileUploadRouter = require("./routes/fileupload/fileUpload.router");
+const dailyMoniterRouter = require("./routes/dailymonitor/dailymonitor.router");
 
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(expressFileUpload()); // express file uploader
 app.use(express.json()); // JSON body parser
 
 /* Implementing routes */
-app.use("/fileupload", fileUploadRoute);
+app.use("/fileupload", fileUploadRouter);
+app.use("/dailymonitor", dailyMoniterRouter);
 
 module.exports = app;
