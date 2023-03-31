@@ -73,7 +73,25 @@ async function makePostReq(uploadUrl, csvfile) {
 
 		return responseData;
 	} catch (error) {
-		console.log("error: ");
+		const {
+			response: {
+				status,
+				statusText,
+				headers: { date },
+			},
+			request: { method },
+			config: { data },
+		} = error;
+
+		const errorResData = {
+			statusCode: status,
+			statusMessage: statusText,
+			method: method,
+			date: date,
+			data: data,
+		};
+
+		return errorResData;
 	}
 }
 
