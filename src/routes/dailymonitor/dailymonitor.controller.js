@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { getDefaultResopnseValues } = require("../../models/dailymonitor.model");
 
 function httpGetDailyMonitorApis(req, res) {
 	res.status(200).json({
@@ -12,12 +13,33 @@ function includesUrl(req) {
 }
 
 // function to check if error mesage is expected or not
-function isExpectedErrorMessage(errorMessage) {
-	const { status, message } = errorMessage;
-	const includesExpectedMessage =
-		status === false && message === "Incorrect url";
+function isExpectedErrorMessage(userRequest, serverResponse) {
+	const { uStatus, uMessage } = userRequest;
+	const { sStatus, sMessage } = serverResponse;
+
+	console.log(userRequest);
+	console.log(serverResponse);
+
+	const includesExpectedMessage = uStatus === sStatus && uMessage === sMessage;
 
 	return includesExpectedMessage;
+}
+
+// if request body includes any value then use it if it doesn't include then use default value provided my model
+function getRequestValues(requestBody) {
+	const { defaultStatus, defaultMessage } = getDefaultResopnseValues();
+	let responseData = new Object();
+
+	const { status, message } = requestBody;
+
+	responseData.uStatus = Boolean(status !== undefined && status.toString())
+		? status
+		: defaultStatus;
+	responseData.uMessage = Boolean(message !== undefined && message)
+		? message
+		: defaultMessage;
+
+	return responseData;
 }
 
 async function httpGetServerResponse(req, res) {
@@ -26,6 +48,8 @@ async function httpGetServerResponse(req, res) {
 			status: "invalid url input",
 		});
 	}
+
+	const userReqValues = getRequestValues(req.body);
 
 	try {
 		let serverResponse = await axios.get(req.body.url);
@@ -43,9 +67,9 @@ async function httpGetServerResponse(req, res) {
 			},
 		} = error;
 
-		const errorMessage = { status: status, message: message };
+		const serverResMessage = { sStatus: status, sMessage: message };
 
-		return isExpectedErrorMessage(!errorMessage)
+		return isExpectedErrorMessage(userReqValues, serverResMessage)
 			? res.status(statusCode).json({
 					success: true,
 					statusCode: statusCode,
