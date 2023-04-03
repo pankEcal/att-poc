@@ -12,20 +12,19 @@ function includesUrl(req) {
 	return Boolean(req.body.url);
 }
 
-// function to check if error mesage is expected or not
+// function to check if error mesage from server is matching to user request
 function isExpectedErrorMessage(userRequest, serverResponse) {
 	const { uStatus, uMessage } = userRequest;
 	const { sStatus, sMessage } = serverResponse;
 
-	console.log(userRequest);
-	console.log(serverResponse);
-
-	const includesExpectedMessage = uStatus === sStatus && uMessage === sMessage;
+	// status is expected in boolean but it can respond differently with the conditional statemetns. Due to that reason, it is converted to string for comparasion only
+	const includesExpectedMessage =
+		uStatus.toString() === sStatus.toString() && uMessage === sMessage;
 
 	return includesExpectedMessage;
 }
 
-// if request body includes any value then use it if it doesn't include then use default value provided my model
+// if request body includes any value then use it if it doesn't include then use default value provided model data
 function getRequestValues(requestBody) {
 	const { defaultStatus, defaultMessage } = getDefaultResopnseValues();
 	let responseData = new Object();
