@@ -1,5 +1,8 @@
 const axios = require("axios");
-const { getDefaultResopnseValues } = require("../../models/dailymonitor.model");
+const {
+	getDefaultResopnseValues,
+	getApisList,
+} = require("../../models/dailymonitor.model");
 
 function httpGetDailyMonitorApis(req, res) {
 	res.status(200).json({
@@ -16,10 +19,6 @@ function includesUrl(req) {
 function isExpectedErrorMessage(userRequest, serverResponse) {
 	const { uStatus, uMessage } = userRequest;
 	const { sStatus, sMessage } = serverResponse;
-
-	console.log(userRequest);
-	console.log(serverResponse);
-	console.log("-------------");
 
 	// status is expected in boolean but it can respond differently with the conditional statemetns. Due to that reason, it is converted to string for comparasion only
 	// check the lower cased value of the message to make validation more general
@@ -45,6 +44,58 @@ function getRequestValues(requestBody) {
 		: defaultMessage;
 
 	return responseData;
+}
+
+async function httpCallFromModel(body, url) {
+	const userReqValues = getRequestValues(body);
+
+	try {
+		let response = await axios.get(url);
+	} catch (error) {
+		const {
+			response: {
+				data: { status, message },
+			},
+			request: {
+				res: { statusCode },
+			},
+		} = error;
+
+		const serverResMessage = { sStatus: status, sMessage: message };
+
+		return isExpectedErrorMessage(userReqValues, serverResMessage)
+			? {
+					success: true,
+					statusCode: statusCode,
+					url: url,
+					message: "test passed, server response matched!!",
+			  }
+			: {
+					success: false,
+					statusCode: statusCode,
+					url: url,
+					message: "test failed, server response didn't matched!!",
+			  };
+	}
+}
+
+async function httpBatchGetServerResponse(req, res) {
+	let apis = getApisList();
+	let responses = [];
+
+	apis.map((apiUrl) => {
+		httpCallFromModel(req.body, apiUrl).then((response) => {
+			// responses.push(response);
+			responses.push(response);
+			console.log(responses);
+			console.log("-------------");
+		});
+	});
+
+	return res.json({
+		hello: "there",
+		responses: responses,
+	});
 }
 
 async function httpGetServerResponse(req, res) {
@@ -88,4 +139,8 @@ async function httpGetServerResponse(req, res) {
 	}
 }
 
-module.exports = { httpGetDailyMonitorApis, httpGetServerResponse };
+module.exports = {
+	httpGetDailyMonitorApis,
+	httpGetServerResponse,
+	httpBatchGetServerResponse,
+};
