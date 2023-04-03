@@ -46,56 +46,53 @@ function getRequestValues(requestBody) {
 	return responseData;
 }
 
-async function httpCallFromModel(body, url) {
-	const userReqValues = getRequestValues(body);
+async function httpCallFromModel(responseBody) {
+	const apis = getApisList();
+	const serverResponses = [];
+	const userReqValues = getRequestValues(responseBody);
 
 	try {
-		let response = await axios.get(url);
+		await axios.get(apis[1]);
+		// since all the passing cases are from 404 response, it's handled in error block
 	} catch (error) {
 		const {
 			response: {
 				data: { status, message },
 			},
 			request: {
-				res: { statusCode },
+				res: { statusCode, responseUrl },
 			},
 		} = error;
 
 		const serverResMessage = { sStatus: status, sMessage: message };
 
-		return isExpectedErrorMessage(userReqValues, serverResMessage)
+		let serverResponse = isExpectedErrorMessage(userReqValues, serverResMessage)
 			? {
 					success: true,
 					statusCode: statusCode,
-					url: url,
 					message: "test passed, server response matched!!",
+					url: responseUrl,
 			  }
 			: {
 					success: false,
 					statusCode: statusCode,
-					url: url,
 					message: "test failed, server response didn't matched!!",
+					url: responseUrl,
 			  };
+
+		serverResponses.push(serverResponse);
 	}
+
+	return {
+		status: "working",
+		data: serverResponses,
+	};
 }
 
 async function httpBatchGetServerResponse(req, res) {
-	let apis = getApisList();
-	let responses = [];
+	const respose = await httpCallFromModel(req.body);
 
-	apis.map((apiUrl) => {
-		httpCallFromModel(req.body, apiUrl).then((response) => {
-			// responses.push(response);
-			responses.push(response);
-			console.log(responses);
-			console.log("-------------");
-		});
-	});
-
-	return res.json({
-		hello: "there",
-		responses: responses,
-	});
+	return res.status(200).json(respose);
 }
 
 async function httpGetServerResponse(req, res) {
