@@ -17,9 +17,15 @@ function isExpectedErrorMessage(userRequest, serverResponse) {
 	const { uStatus, uMessage } = userRequest;
 	const { sStatus, sMessage } = serverResponse;
 
+	console.log(userRequest);
+	console.log(serverResponse);
+	console.log("-------------");
+
 	// status is expected in boolean but it can respond differently with the conditional statemetns. Due to that reason, it is converted to string for comparasion only
+	// check the lower cased value of the message to make validation more general
 	const includesExpectedMessage =
-		uStatus.toString() === sStatus.toString() && uMessage === sMessage;
+		uStatus.toString() === sStatus.toString() &&
+		uMessage.toLowerCase() === sMessage.toLowerCase();
 
 	return includesExpectedMessage;
 }
@@ -35,7 +41,7 @@ function getRequestValues(requestBody) {
 		? status
 		: defaultStatus;
 	responseData.uMessage = Boolean(message !== undefined && message)
-		? message
+		? message.trim()
 		: defaultMessage;
 
 	return responseData;
