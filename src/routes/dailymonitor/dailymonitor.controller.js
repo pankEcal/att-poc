@@ -153,8 +153,18 @@ async function httpGetServerResponse(req, res) {
 	}
 }
 
+// TODO: create a proper validation function after resolving core issues
+async function httpsGetDailyMonitorApis(req, res) {
+	const reqUrl = "https://evaeol.tvsmotor.com/event";
+
+	res.status(200).json({
+		status: "fine",
+	});
+}
+
 module.exports = {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
 	httpGetBatchServerResponse,
+	httpsGetDailyMonitorApis,
 };
