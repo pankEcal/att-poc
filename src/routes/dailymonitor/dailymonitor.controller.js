@@ -4,6 +4,7 @@ const {
 	getApisList,
 } = require("../../models/dailymonitor.model");
 
+// main function to proccess GET request
 function httpGetDailyMonitorApis(req, res) {
 	const apis = getApisList();
 
@@ -58,6 +59,7 @@ async function getBatchHttpResponse(responseBody) {
 	for (let i = 0; i < apis.length; i++) {
 		// since all the passing cases are from 404 response, it's handled in error block only
 		try {
+			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
 			await axios.get(apis[i]);
 		} catch (error) {
 			const {
@@ -117,6 +119,8 @@ async function httpGetServerResponse(req, res) {
 	const userReqValues = getRequestValues(req.body);
 
 	try {
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
+
 		let serverResponse = await axios.get(req.body.url);
 
 		// not performing actions because:
@@ -153,18 +157,8 @@ async function httpGetServerResponse(req, res) {
 	}
 }
 
-// TODO: create a proper validation function after resolving core issues
-async function httpsGetDailyMonitorApis(req, res) {
-	const reqUrl = "https://evaeol.tvsmotor.com/event";
-
-	res.status(200).json({
-		status: "fine",
-	});
-}
-
 module.exports = {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
 	httpGetBatchServerResponse,
-	httpsGetDailyMonitorApis,
 };
