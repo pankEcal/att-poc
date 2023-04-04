@@ -5,56 +5,60 @@ const {
 } = require("../../models/dailymonitor.model");
 
 function httpGetDailyMonitorApis(req, res) {
+	const apis = getApisList();
+
 	res.status(200).json({
-		status: "daily monitor APIs",
+		type: "daily monitor APIs",
+		urls: apis,
 	});
 }
 
-// function to check if request body contains "url" property or not
+// check if request body contains "url" property or not
 function includesUrl(req) {
 	return Boolean(req.body.url);
 }
 
-// function to check if error mesage from server is matching to user request
+// validates if user requested values and server response values are matching or not
 function isExpectedErrorMessage(userRequest, serverResponse) {
-	const { uStatus, uMessage } = userRequest;
-	const { sStatus, sMessage } = serverResponse;
+	const { userStatus, userMessage } = userRequest;
+	const { serverStatus, serverMessage } = serverResponse;
 
 	// status is expected in boolean but it can respond differently with the conditional statemetns. Due to that reason, it is converted to string for comparasion only
 	// check the lower cased value of the message to make validation more general
 	const includesExpectedMessage =
-		uStatus.toString() === sStatus.toString() &&
-		uMessage.toLowerCase() === sMessage.toLowerCase();
+		userStatus === serverStatus.toString() &&
+		userMessage.toLowerCase() === serverMessage.toLowerCase();
 
 	return includesExpectedMessage;
 }
 
-// if request body includes any value then use it if it doesn't include then use default value provided model data
+// if values are not present on request body then pass the default values
 function getRequestValues(requestBody) {
 	const { defaultStatus, defaultMessage } = getDefaultResopnseValues();
 	let responseData = new Object();
 
 	const { status, message } = requestBody;
 
-	responseData.uStatus = Boolean(status !== undefined && status.toString())
-		? status
+	responseData.userStatus = Boolean(status !== undefined && status.toString())
+		? status.toString().trim()
 		: defaultStatus;
-	responseData.uMessage = Boolean(message !== undefined && message)
+	responseData.userMessage = Boolean(message !== undefined && message)
 		? message.trim()
 		: defaultMessage;
 
 	return responseData;
 }
 
+// returns collective response from batch POST requests
 async function getBatchHttpResponse(responseBody) {
 	const apis = getApisList();
 	const serverResponses = [];
 	const userReqValues = getRequestValues(responseBody);
 
 	for (let i = 0; i < apis.length; i++) {
+		// since all the passing cases are from 404 response, it's handled in error block only
 		try {
 			await axios.get(apis[i]);
-			// since all the passing cases are from 404 response, it's handled in error block
 		} catch (error) {
 			const {
 				response: {
@@ -65,7 +69,7 @@ async function getBatchHttpResponse(responseBody) {
 				},
 			} = error;
 
-			const serverResMessage = { sStatus: status, sMessage: message };
+			const serverResMessage = { serverStatus: status, serverMessage: message };
 
 			let serverResponse = isExpectedErrorMessage(
 				userReqValues,
@@ -95,12 +99,14 @@ async function getBatchHttpResponse(responseBody) {
 	};
 }
 
+// main function to process POST requests in a batch
 async function httpGetBatchServerResponse(req, res) {
 	const respose = await getBatchHttpResponse(req.body);
 
 	return res.status(200).json(respose);
 }
 
+// main function to proccess single POST request
 async function httpGetServerResponse(req, res) {
 	if (!includesUrl(req)) {
 		return res.status(400).json({
@@ -126,8 +132,9 @@ async function httpGetServerResponse(req, res) {
 			},
 		} = error;
 
-		const serverResMessage = { sStatus: status, sMessage: message };
+		const serverResMessage = { serverStatus: status, serverMessage: message };
 
+		// return responses based on user requested values and server response values comparasion validation
 		return isExpectedErrorMessage(userReqValues, serverResMessage)
 			? res.status(statusCode).json({
 					success: true,

@@ -9,6 +9,7 @@ const {
 const dailyMonitorRouter = express.Router();
 
 dailyMonitorRouter.get("/", httpGetDailyMonitorApis);
+dailyMonitorRouter.get("/batch", httpGetDailyMonitorApis);
 dailyMonitorRouter.post("/", httpGetServerResponse);
 dailyMonitorRouter.post("/batch", httpGetBatchServerResponse);
 
