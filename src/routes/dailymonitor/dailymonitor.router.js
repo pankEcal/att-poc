@@ -3,13 +3,13 @@ const express = require("express");
 const {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
-	httpBatchGetServerResponse,
+	httpGetBatchServerResponse,
 } = require("./dailymonitor.controller");
 
 const dailyMonitorRouter = express.Router();
 
 dailyMonitorRouter.get("/", httpGetDailyMonitorApis);
 dailyMonitorRouter.post("/", httpGetServerResponse);
-dailyMonitorRouter.post("/batch", httpBatchGetServerResponse);
+dailyMonitorRouter.post("/batch", httpGetBatchServerResponse);
 
 module.exports = dailyMonitorRouter;

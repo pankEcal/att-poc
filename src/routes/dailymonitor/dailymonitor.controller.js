@@ -46,51 +46,57 @@ function getRequestValues(requestBody) {
 	return responseData;
 }
 
-async function httpCallFromModel(responseBody) {
+async function getBatchHttpResponse(responseBody) {
 	const apis = getApisList();
 	const serverResponses = [];
 	const userReqValues = getRequestValues(responseBody);
 
-	try {
-		await axios.get(apis[1]);
-		// since all the passing cases are from 404 response, it's handled in error block
-	} catch (error) {
-		const {
-			response: {
-				data: { status, message },
-			},
-			request: {
-				res: { statusCode, responseUrl },
-			},
-		} = error;
+	for (let i = 0; i < apis.length; i++) {
+		try {
+			await axios.get(apis[i]);
+			// since all the passing cases are from 404 response, it's handled in error block
+		} catch (error) {
+			const {
+				response: {
+					data: { status, message },
+				},
+				request: {
+					res: { statusCode, responseUrl },
+				},
+			} = error;
 
-		const serverResMessage = { sStatus: status, sMessage: message };
+			const serverResMessage = { sStatus: status, sMessage: message };
 
-		let serverResponse = isExpectedErrorMessage(userReqValues, serverResMessage)
-			? {
-					success: true,
-					statusCode: statusCode,
-					message: "test passed, server response matched!!",
-					url: responseUrl,
-			  }
-			: {
-					success: false,
-					statusCode: statusCode,
-					message: "test failed, server response didn't matched!!",
-					url: responseUrl,
-			  };
+			let serverResponse = isExpectedErrorMessage(
+				userReqValues,
+				serverResMessage
+			)
+				? {
+						success: true,
+						statusCode: statusCode,
+						testStatus: "passed",
+						message: "user input and server response matched !",
+						url: responseUrl,
+				  }
+				: {
+						success: false,
+						statusCode: statusCode,
+						testStatus: "failed",
+						message: "user input and server response not matching !!!",
+						url: responseUrl,
+				  };
 
-		serverResponses.push(serverResponse);
+			serverResponses.push(serverResponse);
+		}
 	}
 
 	return {
-		status: "working",
 		data: serverResponses,
 	};
 }
 
-async function httpBatchGetServerResponse(req, res) {
-	const respose = await httpCallFromModel(req.body);
+async function httpGetBatchServerResponse(req, res) {
+	const respose = await getBatchHttpResponse(req.body);
 
 	return res.status(200).json(respose);
 }
@@ -116,7 +122,7 @@ async function httpGetServerResponse(req, res) {
 				data: { status, message },
 			},
 			request: {
-				res: { statusCode },
+				res: { statusCode, responseUrl },
 			},
 		} = error;
 
@@ -126,12 +132,16 @@ async function httpGetServerResponse(req, res) {
 			? res.status(statusCode).json({
 					success: true,
 					statusCode: statusCode,
-					message: "test passed, server response matched!!",
+					testStatus: "passed",
+					message: "user input and server response matched !",
+					url: responseUrl,
 			  })
 			: res.status(statusCode).json({
 					success: false,
 					statusCode: statusCode,
-					message: "test failed, server response didn't matched!!",
+					testStatus: "failed",
+					message: "user input and server response not matching !!!",
+					url: responseUrl,
 			  });
 	}
 }
@@ -139,5 +149,5 @@ async function httpGetServerResponse(req, res) {
 module.exports = {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
-	httpBatchGetServerResponse,
+	httpGetBatchServerResponse,
 };
