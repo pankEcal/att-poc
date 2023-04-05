@@ -1,7 +1,6 @@
 const axios = require("axios");
 const {
 	getDefaultResopnseValues,
-	getApisList,
 	getValidApisWithApplication,
 	getApisListWithApplication,
 } = require("../../models/dailymonitor.model");
@@ -73,6 +72,7 @@ async function getBatchHttpResponse(responseBody) {
 			)
 				? {
 						testStatus: "passed",
+						type: "batch request",
 						success: true,
 						statusCode: statusCode,
 						message: "user input and server response matched !",
@@ -81,6 +81,7 @@ async function getBatchHttpResponse(responseBody) {
 				  }
 				: {
 						testStatus: "failed",
+						type: "batch request",
 						success: false,
 						statusCode: statusCode,
 						message: "user input and server response not matching !!!",
@@ -150,18 +151,24 @@ async function httpGetServerResponse(req, res) {
 		// return responses based on user requested values and server response values comparasion validation
 		return isExpectedErrorMessage(userReqValues, serverResMessage)
 			? res.status(statusCode).json({
-					success: true,
-					statusCode: statusCode,
-					testStatus: "passed",
-					message: "user input and server response matched !",
-					url: responseUrl,
+					data: {
+						testStatus: "passed",
+						type: "individual request",
+						success: true,
+						statusCode: statusCode,
+						message: "user input and server response matched !",
+						url: responseUrl,
+					},
 			  })
 			: res.status(statusCode).json({
-					success: false,
-					statusCode: statusCode,
-					testStatus: "failed",
-					message: "user input and server response not matching !!!",
-					url: responseUrl,
+					data: {
+						testStatus: "failed",
+						type: "individual request",
+						success: false,
+						statusCode: statusCode,
+						message: "user input and server response not matching !!!",
+						url: responseUrl,
+					},
 			  });
 	}
 }
