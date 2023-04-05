@@ -2,18 +2,9 @@ const axios = require("axios");
 const {
 	getDefaultResopnseValues,
 	getApisList,
+	getValidApisWithApplication,
 	getApisListWithApplication,
 } = require("../../models/dailymonitor.model");
-
-// main function to proccess GET request
-function httpGetDailyMonitorApis(req, res) {
-	const apis = getApisList();
-
-	res.status(200).json({
-		type: "daily monitor APIs",
-		urls: apis,
-	});
-}
 
 // check if request body contains "url" property or not
 function includesUrl(req) {
@@ -53,15 +44,17 @@ function getRequestValues(requestBody) {
 
 // returns collective response from batch POST requests
 async function getBatchHttpResponse(responseBody) {
-	const apis = getApisList();
+	const validApis = getValidApisWithApplication();
 	const serverResponses = [];
 	const userReqValues = getRequestValues(responseBody);
 
-	for (let i = 0; i < apis.length; i++) {
+	for (let i = 0; i < validApis.length; i++) {
+		const { application, url } = validApis[i];
+
 		// since all the passing cases are from 404 response, it's handled in error block only
 		try {
 			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
-			await axios.get(apis[i]);
+			await axios.get(url);
 		} catch (error) {
 			const {
 				response: {
@@ -79,17 +72,19 @@ async function getBatchHttpResponse(responseBody) {
 				serverResMessage
 			)
 				? {
+						testStatus: "passed",
 						success: true,
 						statusCode: statusCode,
-						testStatus: "passed",
 						message: "user input and server response matched !",
+						application: application,
 						url: responseUrl,
 				  }
 				: {
+						testStatus: "failed",
 						success: false,
 						statusCode: statusCode,
-						testStatus: "failed",
 						message: "user input and server response not matching !!!",
+						application: application,
 						url: responseUrl,
 				  };
 
@@ -102,7 +97,20 @@ async function getBatchHttpResponse(responseBody) {
 	};
 }
 
-// main function to process POST requests in a batch
+/* ---------------------------------------- */
+/* -----  main controller functions  ------ */
+/* ---------------------------------------- */
+
+// main function to proccess GET request
+function httpGetDailyMonitorApis(req, res) {
+	const apis = getApisListWithApplication();
+
+	res.status(200).json({
+		data: apis,
+	});
+}
+
+// main function to process batch POST requests
 async function httpGetBatchServerResponse(req, res) {
 	const respose = await getBatchHttpResponse(req.body);
 
@@ -158,17 +166,8 @@ async function httpGetServerResponse(req, res) {
 	}
 }
 
-async function httpGetServerResponseWithApplication(req, res) {
-	const apisWithApplications = getApisListWithApplication();
-
-	return res.status(201).json({
-		data: apisWithApplications,
-	});
-}
-
 module.exports = {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
 	httpGetBatchServerResponse,
-	httpGetServerResponseWithApplication,
 };

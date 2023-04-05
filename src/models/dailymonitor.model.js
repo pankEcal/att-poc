@@ -130,8 +130,28 @@ function getApisListWithApplication() {
 	return apisWithApplications;
 }
 
+function getValidApisWithApplication() {
+	const validApis = [];
+
+	apisWithApplications.map((api) => {
+		const { application, urls } = api;
+
+		if (urls.length) {
+			urls.map((url) => {
+				validApis.push({
+					application: application,
+					url: url,
+				});
+			});
+		}
+	});
+
+	return validApis;
+}
+
 module.exports = {
 	getDefaultResopnseValues,
 	getApisList,
+	getValidApisWithApplication,
 	getApisListWithApplication,
 };
