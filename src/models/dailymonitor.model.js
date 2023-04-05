@@ -102,7 +102,7 @@ const apisWithApplications = [
 	},
 
 	{
-		application: "	Eva AI prod",
+		application: "Eva AI prod",
 		urls: [
 			"http://evaai.enginecal.com/event",
 			"http://evaai.enginecal.com/core",

@@ -2,6 +2,7 @@ const axios = require("axios");
 const {
 	getDefaultResopnseValues,
 	getApisList,
+	getApisListWithApplication,
 } = require("../../models/dailymonitor.model");
 
 // main function to proccess GET request
@@ -157,8 +158,17 @@ async function httpGetServerResponse(req, res) {
 	}
 }
 
+async function httpGetServerResponseWithApplication(req, res) {
+	const apisWithApplications = getApisListWithApplication();
+
+	return res.status(201).json({
+		data: apisWithApplications,
+	});
+}
+
 module.exports = {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
 	httpGetBatchServerResponse,
+	httpGetServerResponseWithApplication,
 };
