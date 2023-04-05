@@ -42,7 +42,7 @@ function getRequestValues(requestBody) {
 
 	responseData.userStatus = Boolean(status !== undefined && status.toString())
 		? status.toString().trim()
-		: defaultStatus;
+		: defaultStatus.toString().trim();
 	responseData.userMessage = Boolean(message !== undefined && message)
 		? message.trim()
 		: defaultMessage;
