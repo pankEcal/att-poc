@@ -9,7 +9,7 @@ const {
 const dailyMonitorRouter = express.Router();
 
 // GET methods
-dailyMonitorRouter.get("/getapis", httpGetDailyMonitorApis);
+dailyMonitorRouter.get("/apis", httpGetDailyMonitorApis);
 
 // POST methods
 dailyMonitorRouter.post("/", httpGetServerResponse);
