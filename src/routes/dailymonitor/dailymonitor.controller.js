@@ -43,7 +43,7 @@ function getRequestValues(requestBody) {
 
 // returns collective response from batch POST requests
 async function getBatchHttpResponse(responseBody) {
-	const startTime = Date.now();
+	const batchReqStartTime = Date.now();
 
 	const validApis = getValidApisWithApplication();
 	const serverResponses = [];
@@ -51,6 +51,7 @@ async function getBatchHttpResponse(responseBody) {
 
 	for (let i = 0; i < validApis.length; i++) {
 		const { application, url } = validApis[i];
+		const individualReqStartTime = Date.now();
 
 		// since all the passing cases are from 404 response, it's handled in error block only
 		try {
@@ -67,7 +68,7 @@ async function getBatchHttpResponse(responseBody) {
 			} = error;
 
 			const serverResMessage = { serverStatus: status, serverMessage: message };
-			const timeTaken = Date.now() - startTime;
+			const individualReqTimeTaken = Date.now() - individualReqStartTime;
 
 			let serverResponse = isExpectedErrorMessage(
 				userReqValues,
@@ -78,7 +79,7 @@ async function getBatchHttpResponse(responseBody) {
 						type: "batch request",
 						success: true,
 						statusCode: statusCode,
-						testDuration: `${timeTaken} ms`,
+						testDuration: `${individualReqTimeTaken} ms`,
 						message: "user input and server response matched !",
 						application: application,
 						url: responseUrl,
@@ -88,7 +89,7 @@ async function getBatchHttpResponse(responseBody) {
 						type: "batch request",
 						success: false,
 						statusCode: statusCode,
-						testDuration: `${timeTaken} ms`,
+						testDuration: `${individualReqTimeTaken} ms`,
 						message: "user input and server response not matching !!!",
 						application: application,
 						url: responseUrl,
@@ -98,7 +99,7 @@ async function getBatchHttpResponse(responseBody) {
 		}
 	}
 
-	const batchReqTimeTaken = Date.now() - startTime;
+	const batchReqTimeTaken = Date.now() - batchReqStartTime;
 
 	return {
 		totalTestDuration: `${batchReqTimeTaken} ms`,
