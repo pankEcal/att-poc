@@ -43,6 +43,8 @@ function getRequestValues(requestBody) {
 
 // returns collective response from batch POST requests
 async function getBatchHttpResponse(responseBody) {
+	const startTime = Date.now();
+
 	const validApis = getValidApisWithApplication();
 	const serverResponses = [];
 	const userReqValues = getRequestValues(responseBody);
@@ -65,6 +67,7 @@ async function getBatchHttpResponse(responseBody) {
 			} = error;
 
 			const serverResMessage = { serverStatus: status, serverMessage: message };
+			const timeTaken = Date.now() - startTime;
 
 			let serverResponse = isExpectedErrorMessage(
 				userReqValues,
@@ -75,6 +78,7 @@ async function getBatchHttpResponse(responseBody) {
 						type: "batch request",
 						success: true,
 						statusCode: statusCode,
+						testDuration: `${timeTaken} ms`,
 						message: "user input and server response matched !",
 						application: application,
 						url: responseUrl,
@@ -84,6 +88,7 @@ async function getBatchHttpResponse(responseBody) {
 						type: "batch request",
 						success: false,
 						statusCode: statusCode,
+						testDuration: `${timeTaken} ms`,
 						message: "user input and server response not matching !!!",
 						application: application,
 						url: responseUrl,
@@ -93,7 +98,10 @@ async function getBatchHttpResponse(responseBody) {
 		}
 	}
 
+	const batchReqTimeTaken = Date.now() - startTime;
+
 	return {
+		totalTestDuration: `${batchReqTimeTaken} ms`,
 		data: serverResponses,
 	};
 }
@@ -120,6 +128,8 @@ async function httpGetBatchServerResponse(req, res) {
 
 // main function to proccess single POST request
 async function httpGetServerResponse(req, res) {
+	const startTime = Date.now();
+
 	if (!includesUrl(req)) {
 		return res.status(400).json({
 			status: "invalid url input",
@@ -135,7 +145,6 @@ async function httpGetServerResponse(req, res) {
 
 		// not performing actions because:
 		// response is expected as 404 and is passed to error
-		console.log(serverResponse.data);
 	} catch (error) {
 		const {
 			response: {
@@ -147,6 +156,7 @@ async function httpGetServerResponse(req, res) {
 		} = error;
 
 		const serverResMessage = { serverStatus: status, serverMessage: message };
+		const timeTaken = Date.now() - startTime;
 
 		// return responses based on user requested values and server response values comparasion validation
 		return isExpectedErrorMessage(userReqValues, serverResMessage)
@@ -156,6 +166,7 @@ async function httpGetServerResponse(req, res) {
 						type: "individual request",
 						success: true,
 						statusCode: statusCode,
+						testDuration: `${timeTaken} ms`,
 						message: "user input and server response matched !",
 						url: responseUrl,
 					},
@@ -166,6 +177,7 @@ async function httpGetServerResponse(req, res) {
 						type: "individual request",
 						success: false,
 						statusCode: statusCode,
+						testDuration: `${timeTaken} ms`,
 						message: "user input and server response not matching !!!",
 						url: responseUrl,
 					},
