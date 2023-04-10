@@ -1,4 +1,6 @@
 const express = require("express");
+const multer = require("multer");
+const upload = multer();
 
 const {
 	httpGetDailyMonitorApis,
@@ -12,7 +14,7 @@ const dailyMonitorRouter = express.Router();
 dailyMonitorRouter.get("/apis", httpGetDailyMonitorApis);
 
 // POST methods
-dailyMonitorRouter.post("/", httpGetServerResponse);
-dailyMonitorRouter.post("/batch", httpGetBatchServerResponse);
+dailyMonitorRouter.post("/", upload.none(), httpGetServerResponse);
+dailyMonitorRouter.post("/batch", upload.none(), httpGetBatchServerResponse);
 
 module.exports = dailyMonitorRouter;
