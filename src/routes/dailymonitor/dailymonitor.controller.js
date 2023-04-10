@@ -7,7 +7,11 @@ const {
 
 // check if request body contains "url" property or not
 function includesUrl(req) {
-	return Boolean(req.body.url);
+	if (!req.body) {
+		return false;
+	} else {
+		return Boolean(req.body.url);
+	}
 }
 
 // validates if user requested values and server response values are matching or not
@@ -155,7 +159,7 @@ async function httpGetServerResponse(req, res) {
 
 	if (!includesUrl(req)) {
 		return res.status(400).json({
-			status: "invalid url input",
+			status: "missing url input",
 		});
 	}
 
