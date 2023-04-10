@@ -8,15 +8,17 @@ const {
 	handlefilupload,
 } = require("../fileupload/fileUpload.controller");
 
+// storage realted config to manage file uploads
 const storage = multer.diskStorage({
 	destination: (req, file, callback) => {
 		callback(null, path.join(__dirname, "../../../", "public/uploads"));
 	},
 	filename: (req, file, callback) => {
-		const { originalname } = file;
-		callback(null, originalname);
+		callback(null, "csvfile.csv");
 	},
 });
+
+// managing file upload
 const upload = multer({ storage });
 
 const fileUploadRouter = express.Router();

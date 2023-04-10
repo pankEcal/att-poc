@@ -1,4 +1,7 @@
 const axios = require("axios");
+const path = require("path");
+const fs = require("fs");
+const { parse } = require("csv-parse");
 
 function httpGetRoutes(req, res) {
 	res.status(200).json({
@@ -44,17 +47,12 @@ async function makeHttpReq(uploadUrl) {
 }
 
 // make http POST request with uploaded file
-async function makePostReq(uploadUrl, csvfile) {
+async function makePostReq(uploadUrl, csvfile, deviceId) {
 	try {
-		// const res = await axios({
-		// 	method: "post",
-		// 	url: uploadUrl,
-		// 	data: {
-		// 		csvfile: csvfile,
-		// 	},
-		// });
-
-		const res = await axios.post(uploadUrl, { csvfile });
+		const res = await axios.post(uploadUrl, {
+			body: { devID: deviceId },
+			file: { csvfile },
+		});
 
 		const {
 			status,
@@ -121,6 +119,32 @@ function httpUploadFile(req, res) {
 	});
 }
 
+function getDeviceId() {
+	const deviceIdFilePath = path.join(
+		__dirname,
+		"../../../public/uploads",
+		"devid.txt"
+	);
+
+	fs.createReadStream(
+		path.join(__dirname, "../../../public/uploads", "csvfile.csv")
+	)
+		.pipe(parse({ delimiter: ",", from_line: 2, toLine: 2 }))
+		.on("data", function (row) {
+			fs.writeFileSync(deviceIdFilePath, row[0]);
+		})
+		.on("error", function (error) {
+			console.log(error.message);
+		});
+
+	try {
+		const deviceId = fs.readFileSync(deviceIdFilePath, "utf-8");
+		return deviceId;
+	} catch (error) {
+		console.log("error getting deviceId", error);
+	}
+}
+
 function handlefilupload(req, res) {
 	const isValid = isValidReqData(req);
 
@@ -136,13 +160,11 @@ function handlefilupload(req, res) {
 		file,
 	} = req;
 
-	makePostReq(uploadUrl, file).then((response) => {
+	const deviceId = getDeviceId();
+
+	makePostReq(uploadUrl, file, deviceId).then((response) => {
 		return res.status(200).json(response);
 	});
-
-	// return res.status(201).json({
-	// 	status: "OK",
-	// });
 }
 
 module.exports = { httpGetRoutes, httpUploadFile, handlefilupload };
