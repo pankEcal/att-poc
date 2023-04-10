@@ -70,26 +70,48 @@ async function getBatchHttpResponse(responseBody) {
 			const serverResMessage = { serverStatus: status, serverMessage: message };
 			const individualReqTimeTaken = Date.now() - individualReqStartTime;
 
+			/* 
+			
+					data: {
+						serverResponse: {
+							status: serverResMessage.serverStatus,
+							message: serverResMessage.serverMessage,
+						},
+						statusCode: statusCode,
+						testDuration: `${timeTaken} ms`,
+						testStatus: "passed",
+						testType: "individual request",
+						message: "user input and server response matched !",
+						url: responseUrl,
+					},			
+			*/
+
 			let serverResponse = isExpectedErrorMessage(
 				userReqValues,
 				serverResMessage
 			)
 				? {
-						testStatus: "passed",
-						type: "batch request",
-						success: true,
+						serverResponse: {
+							status: serverResMessage.serverStatus,
+							message: serverResMessage.serverMessage,
+						},
 						statusCode: statusCode,
 						testDuration: `${individualReqTimeTaken} ms`,
+						testStatus: "passed",
+						testType: "batch request",
 						message: "user input and server response matched !",
-						application: application,
 						url: responseUrl,
+						application: application,
 				  }
 				: {
-						testStatus: "failed",
-						type: "batch request",
-						success: false,
+						serverResponse: {
+							status: serverResMessage.serverStatus,
+							message: serverResMessage.serverMessage,
+						},
 						statusCode: statusCode,
 						testDuration: `${individualReqTimeTaken} ms`,
+						testStatus: "failed",
+						testType: "batch request",
 						message: "user input and server response not matching !!!",
 						application: application,
 						url: responseUrl,
@@ -163,22 +185,28 @@ async function httpGetServerResponse(req, res) {
 		return isExpectedErrorMessage(userReqValues, serverResMessage)
 			? res.status(statusCode).json({
 					data: {
-						testStatus: "passed",
-						type: "individual request",
-						success: true,
+						serverResponse: {
+							status: serverResMessage.serverStatus,
+							message: serverResMessage.serverMessage,
+						},
 						statusCode: statusCode,
 						testDuration: `${timeTaken} ms`,
+						testStatus: "passed",
+						testType: "individual request",
 						message: "user input and server response matched !",
 						url: responseUrl,
 					},
 			  })
 			: res.status(statusCode).json({
 					data: {
-						testStatus: "failed",
-						type: "individual request",
-						success: false,
+						serverResponse: {
+							status: serverResMessage.serverStatus,
+							message: serverResMessage.serverMessage,
+						},
 						statusCode: statusCode,
 						testDuration: `${timeTaken} ms`,
+						testStatus: "failed",
+						testType: "individual request",
 						message: "user input and server response not matching !!!",
 						url: responseUrl,
 					},

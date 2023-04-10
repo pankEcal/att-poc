@@ -125,7 +125,7 @@ function handlefilupload(req, res) {
 
 	if (!isValid) {
 		return res.status(400).json({
-			error: "Missing valid data!",
+			error: "Missing required input data!",
 			isValidReqData: isValid,
 		});
 	}
