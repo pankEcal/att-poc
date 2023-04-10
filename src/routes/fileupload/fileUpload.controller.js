@@ -11,12 +11,16 @@ function httpGetRoutes(req, res) {
 
 // method to verify if request has expected data value or not
 function isValidReqData(request) {
-	const {
-		body: { uploadUrl },
-		file,
-	} = request;
+	if (!request.body && !request.file) {
+		return false;
+	} else {
+		const {
+			body: { uploadUrl },
+			file,
+		} = request;
 
-	return Boolean(file) && Boolean(uploadUrl) ? true : false;
+		return Boolean(file) && Boolean(uploadUrl);
+	}
 }
 
 // make POST request with uploaded file
