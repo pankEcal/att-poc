@@ -10,9 +10,10 @@ function httpGetRoutes(req, res) {
 function isValidReqData(request) {
 	const {
 		body: { uploadUrl },
-		files,
+		file,
 	} = request;
-	return Boolean(files) && Boolean(uploadUrl) ? true : false;
+
+	return Boolean(file) && Boolean(uploadUrl) ? true : false;
 }
 
 // make POST request with uploaded file
@@ -45,15 +46,15 @@ async function makeHttpReq(uploadUrl) {
 // make http POST request with uploaded file
 async function makePostReq(uploadUrl, csvfile) {
 	try {
-		const res = await axios({
-			method: "post",
-			url: uploadUrl,
-			data: {
-				"key 1": "val 1",
-				"key 2": "val 2",
-				"key 3": "val 3",
-			},
-		});
+		// const res = await axios({
+		// 	method: "post",
+		// 	url: uploadUrl,
+		// 	data: {
+		// 		csvfile: csvfile,
+		// 	},
+		// });
+
+		const res = await axios.post(uploadUrl, { csvfile });
 
 		const {
 			status,
@@ -120,4 +121,28 @@ function httpUploadFile(req, res) {
 	});
 }
 
-module.exports = { httpGetRoutes, httpUploadFile };
+function handlefilupload(req, res) {
+	const isValid = isValidReqData(req);
+
+	if (!isValid) {
+		return res.status(400).json({
+			error: "Missing valid data!",
+			isValidReqData: isValid,
+		});
+	}
+
+	const {
+		body: { uploadUrl },
+		file,
+	} = req;
+
+	makePostReq(uploadUrl, file).then((response) => {
+		return res.status(200).json(response);
+	});
+
+	// return res.status(201).json({
+	// 	status: "OK",
+	// });
+}
+
+module.exports = { httpGetRoutes, httpUploadFile, handlefilupload };
