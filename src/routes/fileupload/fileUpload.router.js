@@ -4,7 +4,6 @@ const path = require("path");
 
 const {
 	httpGetRoutes,
-	httpUploadFile,
 	handlefilupload,
 } = require("../fileupload/fileUpload.controller");
 
@@ -25,8 +24,6 @@ const fileUploadRouter = express.Router();
 
 fileUploadRouter.get("/", httpGetRoutes);
 
-fileUploadRouter.post("/", httpUploadFile);
-
-fileUploadRouter.post("/test1", upload.single("csvfile"), handlefilupload);
+fileUploadRouter.post("/", upload.single("csvfile"), handlefilupload);
 
 module.exports = fileUploadRouter;

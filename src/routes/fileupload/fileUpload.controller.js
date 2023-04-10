@@ -94,31 +94,6 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 	}
 }
 
-// main method to handle POST request
-function httpUploadFile(req, res) {
-	const isValid = isValidReqData(req);
-
-	if (!isValid) {
-		return res.status(400).json({
-			error: "Missing valid data!",
-			isValidReqData: isValid,
-		});
-	}
-
-	const {
-		body: { uploadUrl },
-		files: { csvfile },
-	} = req;
-
-	// makeHttpReq(req.body.uploadUrl).then((response) => {
-	// 	return res.status(200).json(response);
-	// });
-
-	makePostReq(uploadUrl, csvfile).then((response) => {
-		return res.status(200).json(response);
-	});
-}
-
 function getDeviceId() {
 	const deviceIdFilePath = path.join(
 		__dirname,
@@ -167,4 +142,4 @@ function handlefilupload(req, res) {
 	});
 }
 
-module.exports = { httpGetRoutes, httpUploadFile, handlefilupload };
+module.exports = { httpGetRoutes, handlefilupload };
