@@ -54,8 +54,8 @@ async function makeHttpReq(uploadUrl) {
 async function makePostReq(uploadUrl, csvfile, deviceId) {
 	try {
 		const res = await axios.post(uploadUrl, {
-			body: { devID: deviceId },
-			file: { csvfile },
+			devID: deviceId,
+			csvfile,
 		});
 
 		const {
@@ -63,7 +63,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 			statusText,
 			headers: { date },
 			request: { method },
-			data: { data },
+			data: { json, url },
 		} = res;
 
 		let responseData = {
@@ -71,7 +71,8 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 			statusMessage: statusText,
 			method: method,
 			date: date,
-			data: data,
+			requestUrl: url,
+			data: json,
 		};
 
 		return responseData;
