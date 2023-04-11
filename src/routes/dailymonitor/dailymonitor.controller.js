@@ -3,6 +3,7 @@ const {
 	getDefaultResopnseValues,
 	getValidApisWithApplication,
 	getApisListWithApplication,
+	getApisList,
 } = require("../../models/dailymonitor.model");
 
 // check if request body contains "url" property or not
@@ -74,22 +75,6 @@ async function getBatchHttpResponse(responseBody) {
 			const serverResMessage = { serverStatus: status, serverMessage: message };
 			const individualReqTimeTaken = Date.now() - individualReqStartTime;
 
-			/* 
-			
-					data: {
-						serverResponse: {
-							status: serverResMessage.serverStatus,
-							message: serverResMessage.serverMessage,
-						},
-						statusCode: statusCode,
-						testDuration: `${timeTaken} ms`,
-						testStatus: "passed",
-						testType: "individual request",
-						message: "user input and server response matched !",
-						url: responseUrl,
-					},			
-			*/
-
 			let serverResponse = isExpectedErrorMessage(
 				userReqValues,
 				serverResMessage
@@ -133,6 +118,10 @@ async function getBatchHttpResponse(responseBody) {
 	};
 }
 
+function isValidUrl(request) {
+	return getApisList().includes(request.body.url);
+}
+
 /* ---------------------------------------- */
 /* -----  main controller functions  ------ */
 /* ---------------------------------------- */
@@ -159,7 +148,15 @@ async function httpGetServerResponse(req, res) {
 
 	if (!includesUrl(req)) {
 		return res.status(400).json({
-			status: "missing url input",
+			testStatus: "failed",
+			message: "missing url input",
+		});
+	}
+
+	if (!isValidUrl(req)) {
+		return res.status(400).json({
+			testStatus: "failed",
+			message: "invalid url input",
 		});
 	}
 
