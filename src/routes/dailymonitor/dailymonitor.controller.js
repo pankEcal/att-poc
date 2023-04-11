@@ -114,6 +114,7 @@ async function getBatchHttpResponse(responseBody) {
 
 	return {
 		totalTestDuration: `${batchReqTimeTaken} ms`,
+		apisTested: serverResponses.length,
 		data: serverResponses,
 	};
 }
