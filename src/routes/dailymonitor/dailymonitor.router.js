@@ -6,6 +6,7 @@ const {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
 	httpGetBatchServerResponse,
+	httpGetBatchApplicationResponse,
 } = require("./dailymonitor.controller");
 
 const dailyMonitorRouter = express.Router();
@@ -16,5 +17,10 @@ dailyMonitorRouter.get("/apis", httpGetDailyMonitorApis);
 // POST methods
 dailyMonitorRouter.post("/", upload.none(), httpGetServerResponse);
 dailyMonitorRouter.post("/batch", upload.none(), httpGetBatchServerResponse);
+dailyMonitorRouter.post(
+	"/:applicationParam",
+	upload.none(),
+	httpGetBatchApplicationResponse
+);
 
 module.exports = dailyMonitorRouter;

@@ -216,8 +216,18 @@ async function httpGetServerResponse(req, res) {
 	}
 }
 
+function httpGetBatchApplicationResponse(req, res) {
+	const { applicationParam } = req.params;
+	console.log(applicationParam);
+
+	return res.status(200).json({
+		status: "OK",
+	});
+}
+
 module.exports = {
 	httpGetDailyMonitorApis,
 	httpGetServerResponse,
 	httpGetBatchServerResponse,
+	httpGetBatchApplicationResponse,
 };
