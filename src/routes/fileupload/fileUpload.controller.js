@@ -72,6 +72,30 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 	}
 }
 
+// method to remove the uploaded files from client side
+function unlinkFiles() {
+	const uploadFilesPath = path.join(__dirname, "../../../public/uploads");
+	const csvfilePath = path.join(uploadFilesPath, "csvfile.csv");
+	const deviceIdFilePath = path.join(uploadFilesPath, "devid.txt");
+
+	fs.access(uploadFilesPath, (error) => {
+		if (!error) {
+			fs.unlink(csvfilePath, (error) => {
+				console.log(
+					!error ? "csv file unlinked!" : "error unlinking csv file" + error
+				);
+			});
+			fs.unlink(deviceIdFilePath, (error) => {
+				console.log(
+					!error
+						? "device id file unlinked!"
+						: "error unlinking device id file" + error
+				);
+			});
+		}
+	});
+}
+
 // get device ID from the csv file
 function getDeviceId() {
 	const deviceIdFilePath = path.join(
