@@ -92,6 +92,13 @@ function getApisList() {
 	return apis;
 }
 
+function getApplicationsList() {
+	const applications = [];
+	apisWithApplications.map((item) => applications.push(item.application));
+
+	return applications;
+}
+
 function getApisListWithApplication() {
 	return apisWithApplications;
 }
@@ -118,4 +125,5 @@ module.exports = {
 	getApisList,
 	getValidApisWithApplication,
 	getApisListWithApplication,
+	getApplicationsList,
 };

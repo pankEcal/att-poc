@@ -18,7 +18,7 @@ dailyMonitorRouter.get("/apis", httpGetDailyMonitorApis);
 dailyMonitorRouter.post("/", upload.none(), httpGetServerResponse);
 dailyMonitorRouter.post("/batch", upload.none(), httpGetBatchServerResponse);
 dailyMonitorRouter.post(
-	"/:applicationParam",
+	"/application",
 	upload.none(),
 	httpGetBatchApplicationResponse
 );

@@ -4,6 +4,7 @@ const {
 	getValidApisWithApplication,
 	getApisListWithApplication,
 	getApisList,
+	getApplicationsList,
 } = require("../../models/dailymonitor.model");
 
 // check if request body contains "url" property or not
@@ -87,6 +88,85 @@ async function getBatchHttpResponse(responseBody) {
 						statusCode: statusCode,
 						testDuration: `${individualReqTimeTaken} ms`,
 						testStatus: "passed",
+						testType: "applications request",
+						message: "user input and server response matched !",
+						url: responseUrl,
+						application: application,
+				  }
+				: {
+						serverResponse: {
+							status: serverResMessage.serverStatus,
+							message: serverResMessage.serverMessage,
+						},
+						statusCode: statusCode,
+						testDuration: `${individualReqTimeTaken} ms`,
+						testStatus: "failed",
+						testType: "applications request",
+						message: "user input and server response not matching !!!",
+						application: application,
+						url: responseUrl,
+				  };
+
+			serverResponses.push(serverResponse);
+		}
+	}
+
+	const batchReqTimeTaken = Date.now() - batchReqStartTime;
+
+	return {
+		totalTestDuration: `${batchReqTimeTaken} ms`,
+		apisTested: serverResponses.length,
+		data: serverResponses,
+	};
+}
+
+function isValidUrl(request) {
+	return getApisList().includes(request.body.url);
+}
+
+async function getApplicationRespose(app) {
+	const batchReqStartTime = Date.now();
+
+	const serverResponses = [];
+	const userReqValues = getRequestValues(app);
+	let { application } = app;
+
+	for (let i = 0; i < app.urls.length; i++) {
+		const url = app.urls[i];
+		const individualReqStartTime = Date.now();
+
+		// since all the passing cases are from 404 response, it's handled in error block only
+		try {
+			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
+			await axios.get(url);
+		} catch (error) {
+			const {
+				response: {
+					data: { status, message },
+				},
+				request: {
+					res: { statusCode, responseUrl },
+				},
+			} = error;
+
+			const serverResMessage = {
+				serverStatus: status,
+				serverMessage: message,
+			};
+			const individualReqTimeTaken = Date.now() - individualReqStartTime;
+
+			let serverResponse = isExpectedErrorMessage(
+				userReqValues,
+				serverResMessage
+			)
+				? {
+						serverResponse: {
+							status: serverResMessage.serverStatus,
+							message: serverResMessage.serverMessage,
+						},
+						statusCode: statusCode,
+						testDuration: `${individualReqTimeTaken} ms`,
+						testStatus: "passed",
 						testType: "batch request",
 						message: "user input and server response matched !",
 						url: responseUrl,
@@ -109,7 +189,6 @@ async function getBatchHttpResponse(responseBody) {
 			serverResponses.push(serverResponse);
 		}
 	}
-
 	const batchReqTimeTaken = Date.now() - batchReqStartTime;
 
 	return {
@@ -117,10 +196,6 @@ async function getBatchHttpResponse(responseBody) {
 		apisTested: serverResponses.length,
 		data: serverResponses,
 	};
-}
-
-function isValidUrl(request) {
-	return getApisList().includes(request.body.url);
 }
 
 /* ---------------------------------------- */
@@ -216,13 +291,24 @@ async function httpGetServerResponse(req, res) {
 	}
 }
 
-function httpGetBatchApplicationResponse(req, res) {
-	const { applicationParam } = req.params;
-	console.log(applicationParam);
+// main function to proccess single application POST request
+async function httpGetBatchApplicationResponse(req, res) {
+	const requestedApplication = req.body.application.trim();
+	const appsList = getApplicationsList();
+	const apis = getApisListWithApplication();
 
-	return res.status(200).json({
-		status: "OK",
-	});
+	if (appsList.includes(requestedApplication)) {
+		const applicationIndex = appsList.indexOf(requestedApplication);
+		const application = apis[applicationIndex];
+
+		let response = await getApplicationRespose(application);
+
+		return res.status(200).json(response);
+	} else {
+		return res.status(400).json({
+			status: "NOT OK",
+		});
+	}
 }
 
 module.exports = {
