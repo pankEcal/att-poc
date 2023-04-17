@@ -75,6 +75,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 // method to remove the uploaded files from client side
 function unlinkFiles() {
 	const uploadFilesPath = path.join(__dirname, "../../../public/uploads");
+
 	const csvfilePath = path.join(uploadFilesPath, "csvfile.csv");
 	const deviceIdFilePath = path.join(uploadFilesPath, "deviceid.txt");
 
@@ -103,6 +104,10 @@ function getDeviceId() {
 		"../../../public/uploads",
 		"deviceid.txt"
 	);
+
+	fs.writeFileSync(deviceIdFilePath, "", (err) => {
+		console.log(err ? err : "deviceid.txt file created");
+	});
 
 	fs.createReadStream(
 		path.join(__dirname, "../../../public/uploads", "csvfile.csv")
@@ -141,6 +146,7 @@ function handlefilupload(req, res) {
 	const deviceId = getDeviceId();
 
 	makePostReq(uploadUrl, file, deviceId).then((response) => {
+		unlinkFiles();
 		return res.status(200).json(response);
 	});
 }
