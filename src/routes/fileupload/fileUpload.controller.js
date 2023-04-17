@@ -76,7 +76,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 function unlinkFiles() {
 	const uploadFilesPath = path.join(__dirname, "../../../public/uploads");
 	const csvfilePath = path.join(uploadFilesPath, "csvfile.csv");
-	const deviceIdFilePath = path.join(uploadFilesPath, "devid.txt");
+	const deviceIdFilePath = path.join(uploadFilesPath, "deviceid.txt");
 
 	fs.access(uploadFilesPath, (error) => {
 		if (!error) {
@@ -101,7 +101,7 @@ function getDeviceId() {
 	const deviceIdFilePath = path.join(
 		__dirname,
 		"../../../public/uploads",
-		"devid.txt"
+		"deviceid.txt"
 	);
 
 	fs.createReadStream(
