@@ -49,6 +49,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 			statusMessage: statusText,
 			method: method,
 			requestUrl: responseUrl,
+			deviceId: deviceId,
 			date: date,
 			data: data,
 		};
