@@ -81,18 +81,11 @@ function unlinkFiles() {
 
 	fs.access(uploadFilesPath, (error) => {
 		if (!error) {
-			fs.unlink(csvfilePath, (error) => {
-				console.log(
-					!error ? "csv file unlinked!" : "error unlinking csv file" + error
-				);
-			});
-			fs.unlink(deviceIdFilePath, (error) => {
-				console.log(
-					!error
-						? "device id file unlinked!"
-						: "error unlinking device id file" + error
-				);
-			});
+			const csvWriteStream = fs.createWriteStream(csvfilePath);
+			csvWriteStream.write("");
+
+			const devIdWriteStream = fs.createWriteStream(deviceIdFilePath);
+			devIdWriteStream.write("");
 		}
 	});
 }
@@ -152,7 +145,7 @@ async function handlefilupload(req, res) {
 
 	makePostReq(uploadUrl, file, deviceId).then((response) => {
 		unlinkFiles();
-		return res.status(200).json(response);
+		return res.status(response.statusCode).json(response);
 	});
 }
 
