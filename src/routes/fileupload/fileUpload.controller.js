@@ -2,6 +2,7 @@ const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
 const { parse } = require("csv-parse");
+const FormData = require("form-data");
 
 function httpGetRoutes(req, res) {
 	res.status(200).json({
@@ -26,26 +27,30 @@ function isValidReqData(request) {
 // make http POST request with uploaded file
 async function makePostReq(uploadUrl, csvfile, deviceId) {
 	try {
-		const res = await axios.post(uploadUrl, {
-			devID: deviceId,
-			csvfile,
-		});
+		let formDataInfo = new FormData();
+		formDataInfo.append("devID", deviceId);
+		formDataInfo.append("csvfile", fs.createReadStream(csvfile.path));
+
+		const res = await axios.post(uploadUrl, formDataInfo);
 
 		const {
 			status,
 			statusText,
 			headers: { date },
-			request: { method },
-			data: { json, url },
+			request: {
+				method,
+				res: { responseUrl },
+			},
+			data,
 		} = res;
 
 		let responseData = {
 			statusCode: status,
 			statusMessage: statusText,
 			method: method,
+			requestUrl: responseUrl,
 			date: date,
-			requestUrl: url,
-			data: json,
+			data: data,
 		};
 
 		return responseData;
