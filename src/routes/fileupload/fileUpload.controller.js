@@ -93,16 +93,12 @@ function unlinkFiles() {
 						: "error unlinking device id file" + error
 				);
 			});
-
-			// fs.writeFile(deviceIdFilePath, "", (err) => {
-			// 	if (err) console.log(err.message);
-			// });
 		}
 	});
 }
 
 // read csv file and return device ID
-function readCsvAndGetDeviceId() {
+async function getDeviceId() {
 	return new Promise((resolve, reject) => {
 		const csvFilePath = path.join(
 			__dirname,
@@ -135,16 +131,6 @@ function readCsvAndGetDeviceId() {
 				reject(error);
 			});
 	});
-}
-
-// get the device ID using helper function
-async function getDeviceId() {
-	try {
-		return await readCsvAndGetDeviceId();
-		// do something with the variable
-	} catch (error) {
-		console.log("Error getting device ID:", error);
-	}
 }
 
 async function handlefilupload(req, res) {
