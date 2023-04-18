@@ -93,42 +93,61 @@ function unlinkFiles() {
 						: "error unlinking device id file" + error
 				);
 			});
+
+			// fs.writeFile(deviceIdFilePath, "", (err) => {
+			// 	if (err) console.log(err.message);
+			// });
 		}
 	});
 }
 
-// get device ID from the csv file
-function getDeviceId() {
-	const deviceIdFilePath = path.join(
-		__dirname,
-		"../../../public/uploads",
-		"deviceid.txt"
-	);
+// read csv file and return device ID
+function readCsvAndGetDeviceId() {
+	return new Promise((resolve, reject) => {
+		const csvFilePath = path.join(
+			__dirname,
+			"../../../public/uploads",
+			"csvfile.csv"
+		);
+		const deviceIdFilePath = path.join(
+			__dirname,
+			"../../../public/uploads",
+			"deviceid.txt"
+		);
 
-	fs.writeFileSync(deviceIdFilePath, "", (err) => {
-		console.log(err ? err : "deviceid.txt file created");
+		const writeStream = fs.createWriteStream(deviceIdFilePath);
+
+		fs.createReadStream(csvFilePath)
+			.pipe(parse({ delimiter: ",", from_line: 2, toLine: 2 }))
+			.on("data", function (row) {
+				writeStream.write(row[0], "utf8");
+			})
+			.on("end", function () {
+				writeStream.end();
+				try {
+					const deviceId = fs.readFileSync(deviceIdFilePath, "utf-8");
+					resolve(deviceId);
+				} catch (error) {
+					reject(error);
+				}
+			})
+			.on("error", function (error) {
+				reject(error);
+			});
 	});
+}
 
-	fs.createReadStream(
-		path.join(__dirname, "../../../public/uploads", "csvfile.csv")
-	)
-		.pipe(parse({ delimiter: ",", from_line: 2, toLine: 2 }))
-		.on("data", function (row) {
-			fs.writeFileSync(deviceIdFilePath, row[0]);
-		})
-		.on("error", function (error) {
-			console.log(error.message);
-		});
-
+// get the device ID using helper function
+async function getDeviceId() {
 	try {
-		const deviceId = fs.readFileSync(deviceIdFilePath, "utf-8");
-		return deviceId;
+		return await readCsvAndGetDeviceId();
+		// do something with the variable
 	} catch (error) {
-		console.log("error getting deviceId", error);
+		console.log("Error getting device ID:", error);
 	}
 }
 
-function handlefilupload(req, res) {
+async function handlefilupload(req, res) {
 	const isValid = isValidReqData(req);
 
 	if (!isValid) {
@@ -143,7 +162,7 @@ function handlefilupload(req, res) {
 		file,
 	} = req;
 
-	const deviceId = getDeviceId();
+	const deviceId = await getDeviceId();
 
 	makePostReq(uploadUrl, file, deviceId).then((response) => {
 		unlinkFiles();
