@@ -192,8 +192,9 @@ async function getApplicationRespose(app) {
 	const batchReqTimeTaken = Date.now() - batchReqStartTime;
 
 	return {
-		totalTestDuration: `${batchReqTimeTaken} ms`,
+		application: application,
 		apisTested: serverResponses.length,
+		totalTestDuration: `${batchReqTimeTaken} ms`,
 		data: serverResponses,
 	};
 }
