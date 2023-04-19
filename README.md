@@ -21,10 +21,30 @@ Steps to setup the app:
    Expected fields:
 
    - `url`: URL to perform the test with. _(mandatory field)_
+     > NOTE: while passing url value, be sure that the letter casing is exectly same as application name provided at GET `/dailymonitor/apis`
    - `status`: to verify if the user given status value is matching with the server responded status. _(If the value isn't passed then default value will be used)_
    - `message`: to verify if the user given message value is matching with the server responded message. _(If the value isn't passed then default value will be used)_
 
    > NOTE: Default values for `status` and `message` are `false` and `Incorrect url` respectively.
+
+   The test response should appear like following. Based on the value of the `testStatus` in the response, the test status is determined. `passed` for passed case and `failed` for failed case.
+
+   ```JSON
+   {
+      "data": {
+         "serverResponse": {
+               "status": false,
+               "message": "Incorrect url"
+         },
+         "statusCode": 404,
+         "testDuration": "522 ms",
+         "testStatus": "passed",
+         "testType": "individual request",
+         "message": "user input and server response matched !",
+         "url": "http://evaaidev.enginecal.com/core"
+      }
+   }
+   ```
 
 3. POST `/dailymonitor/batch` to make batch test request on all the listed URLs.
 
@@ -35,12 +55,87 @@ Steps to setup the app:
 
    > NOTE: Default values for `status` and `message` are `false` and `Incorrect url` respectively.
 
+   The test response should appear like following. Based on the value of the `testStatus` in the response, the test status is determined for each of the URL checked. `passed` for passed case and `failed` for failed case.
+
+   ```JSON
+   {
+      "totalTestDuration": "4157 ms",
+      "apisTested": 2,
+      "data": [
+         {
+               "serverResponse": {
+                  "status": false,
+                  "message": "Incorrect url"
+               },
+               "statusCode": 404,
+               "testDuration": "336 ms",
+               "testStatus": "passed",
+               "testType": "batch test request",
+               "message": "user input and server response matched !",
+               "url": "http://tvseoldev.enginecal.com/event",
+               "application": "EOL Application Dev"
+         },
+         {
+               "serverResponse": {
+                  "status": false,
+                  "message": "Incorrect url"
+               },
+               "statusCode": 404,
+               "testDuration": "78 ms",
+               "testStatus": "passed",
+               "testType": "batch test request",
+               "message": "user input and server response matched !",
+               "url": "http://tvseoldev.enginecal.com/core",
+               "application": "EOL Application Dev"
+         }
+      ]
+   }
+   ```
+
 4. POST `/dailymonitor/application` to make batch test request on all URLs related to a particular application only.
 
    Expected fields:
 
-   - `requestedApplication`: should be the name of the application whose URLs are being tested. (_mandatory field_)
+   - `application`: should be the name of the application whose URLs are being tested. (_mandatory field_)
      > NOTE: while passing value, be sure that the letter casing is exectly same as application name provided at GET `/dailymonitor/apis`
+
+   The test response should appear like following. Based on the value of the `testStatus` in the response, the test status is determined for each of the URL checked. `passed` for passed case and `failed` for failed case.
+
+   ```JSON
+   {
+      "application": "EOL Application Prod",
+      "apisTested": 2,
+      "totalTestDuration": "297 ms",
+      "data": [
+         {
+               "serverResponse": {
+                  "status": false,
+                  "message": "Incorrect url"
+               },
+               "statusCode": 404,
+               "testDuration": "156 ms",
+               "testStatus": "passed",
+               "testType": "application urls batch request",
+               "message": "user input and server response matched !",
+               "url": "https://evaeol.tvsmotor.com/event",
+               "application": "EOL Application Prod"
+         },
+         {
+               "serverResponse": {
+                  "status": false,
+                  "message": "Incorrect url"
+               },
+               "statusCode": 404,
+               "testDuration": "140 ms",
+               "testStatus": "passed",
+               "testType": "application urls batch request",
+               "message": "user input and server response matched !",
+               "url": "https://evaeol.tvsmotor.com/core",
+               "application": "EOL Application Prod"
+         }
+      ]
+   }
+   ```
 
 ### **2. File upload API:**
 
