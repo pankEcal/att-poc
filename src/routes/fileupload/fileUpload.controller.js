@@ -4,12 +4,6 @@ const fs = require("fs");
 const { parse } = require("csv-parse");
 const FormData = require("form-data");
 
-function httpGetRoutes(req, res) {
-	res.status(200).json({
-		message: "file upload API",
-	});
-}
-
 // method to verify if request has expected data value or not
 function isValidReqData(request) {
 	if (!request.body && !request.file) {
@@ -21,67 +15,6 @@ function isValidReqData(request) {
 		} = request;
 
 		return Boolean(file) && Boolean(uploadUrl);
-	}
-}
-
-// make http POST request with uploaded file
-async function makePostReq(uploadUrl, csvfile, deviceId) {
-	try {
-		const fileUploadStartTime = Date.now();
-		let formDataInfo = new FormData();
-		formDataInfo.append("devID", deviceId);
-		formDataInfo.append("csvfile", fs.createReadStream(csvfile.path));
-
-		const fileUploadResponse = await axios.post(uploadUrl, formDataInfo);
-
-		const {
-			statusText,
-			headers: { date },
-			request: {
-				method,
-				res: { responseUrl, statusCode },
-			},
-			data,
-		} = fileUploadResponse;
-
-		const fileUploadTimeTaken = Date.now() - fileUploadStartTime;
-
-		let responseData = {
-			testStatus: "passed",
-			testType: "file upload",
-			testDuration: `${fileUploadTimeTaken} ms`,
-			url: responseUrl,
-			method: method,
-			date: date,
-			deviceId: deviceId,
-			serverResponse: { statusCode, statusText, ...data },
-		};
-
-		clearFiles();
-		return responseData;
-	} catch (error) {
-		const {
-			response: {
-				statusText,
-				headers: { date },
-			},
-			request: {
-				method,
-				res: { responseUrl, statusCode },
-			},
-		} = error;
-
-		const errorResData = {
-			testStatus: "falied",
-			testType: "file upload",
-			url: responseUrl,
-			method: method,
-			date: date,
-			statusCode: statusCode,
-			statusMessage: statusText,
-		};
-
-		return errorResData;
 	}
 }
 
@@ -139,6 +72,85 @@ async function getDeviceId() {
 	});
 }
 
+// make http POST request with uploaded file
+async function makePostReq(uploadUrl, csvfile, deviceId) {
+	try {
+		const fileUploadStartTime = Date.now();
+		let formDataInfo = new FormData();
+		formDataInfo.append("devID", deviceId);
+		formDataInfo.append("csvfile", fs.createReadStream(csvfile.path));
+
+		const fileUploadResponse = await axios.post(uploadUrl, formDataInfo);
+
+		const {
+			statusText,
+			headers: { date },
+			request: {
+				method,
+				res: { responseUrl, statusCode },
+			},
+			data,
+		} = fileUploadResponse;
+
+		const fileUploadTimeTaken = Date.now() - fileUploadStartTime;
+
+		let responseData = {
+			testStatus: "passed",
+			testType: "file upload",
+			testDuration: `${fileUploadTimeTaken} ms`,
+			url: responseUrl,
+			method: method,
+			date: date,
+			deviceId: deviceId,
+			serverResponse: { statusCode, statusText, ...data },
+		};
+
+		clearFiles();
+		return responseData;
+	} catch (error) {
+		const {
+			message,
+			response: {
+				statusText,
+				headers: { date },
+				data,
+			},
+			request: {
+				method,
+				res: { responseUrl, statusCode },
+			},
+		} = error;
+
+		const errorResData = {
+			testStatus: "falied",
+			testType: "file upload",
+			message: message,
+			url: responseUrl,
+			method: method,
+			date: date,
+			serverResponse: {
+				statusCode,
+				statusText,
+				data,
+			},
+		};
+
+		return errorResData;
+	}
+}
+
+/* ---------------------------------------- */
+/* -----  main controller functions  ------ */
+/* ---------------------------------------- */
+
+// main function to proccess GET request
+function httpGetRoutes(req, res) {
+	res.status(200).json({
+		message: "file upload API",
+	});
+}
+
+// main function to proccess POST file upload request
 async function handlefilupload(req, res) {
 	const isValid = isValidReqData(req);
 
