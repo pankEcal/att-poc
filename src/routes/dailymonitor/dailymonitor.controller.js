@@ -299,8 +299,8 @@ async function httpGetServerResponse(req, res) {
 
 // main function to proccess single application POST request
 async function httpGetBatchApplicationResponse(req, res) {
-	const requestedApplication = req.body.application.trim();
-	const appsList = getApplicationsList();
+	const requestedApplication = req.body.application.trim().toLowerCase();
+	const appsList = getApplicationsList().map((api) => api.toLowerCase());
 	const apis = getApisListWithApplication();
 
 	if (appsList.includes(requestedApplication)) {
