@@ -6,7 +6,7 @@ const FormData = require("form-data");
 
 function httpGetRoutes(req, res) {
 	res.status(200).json({
-		status: "API is working fine",
+		message: "file upload API",
 	});
 }
 
@@ -27,51 +27,58 @@ function isValidReqData(request) {
 // make http POST request with uploaded file
 async function makePostReq(uploadUrl, csvfile, deviceId) {
 	try {
+		const fileUploadStartTime = Date.now();
 		let formDataInfo = new FormData();
 		formDataInfo.append("devID", deviceId);
 		formDataInfo.append("csvfile", fs.createReadStream(csvfile.path));
 
-		const res = await axios.post(uploadUrl, formDataInfo);
+		const fileUploadResponse = await axios.post(uploadUrl, formDataInfo);
 
 		const {
-			status,
 			statusText,
 			headers: { date },
 			request: {
 				method,
-				res: { responseUrl },
+				res: { responseUrl, statusCode },
 			},
 			data,
-		} = res;
+		} = fileUploadResponse;
+
+		const fileUploadTimeTaken = Date.now() - fileUploadStartTime;
 
 		let responseData = {
-			statusCode: status,
-			statusMessage: statusText,
+			testStatus: "passed",
+			testType: "file upload",
+			testDuration: `${fileUploadTimeTaken} ms`,
+			url: responseUrl,
 			method: method,
-			requestUrl: responseUrl,
-			deviceId: deviceId,
 			date: date,
-			data: data,
+			deviceId: deviceId,
+			serverResponse: { statusCode, statusText, ...data },
 		};
 
+		clearFiles();
 		return responseData;
 	} catch (error) {
 		const {
 			response: {
-				status,
 				statusText,
 				headers: { date },
 			},
-			request: { method },
-			config: { data },
+			request: {
+				method,
+				res: { responseUrl, statusCode },
+			},
 		} = error;
 
 		const errorResData = {
-			statusCode: status,
-			statusMessage: statusText,
+			testStatus: "falied",
+			testType: "file upload",
+			url: responseUrl,
 			method: method,
 			date: date,
-			data: data,
+			statusCode: statusCode,
+			statusMessage: statusText,
 		};
 
 		return errorResData;
@@ -79,7 +86,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 }
 
 // method to remove the uploaded files from client side
-function unlinkFiles() {
+function clearFiles() {
 	const uploadFilesPath = path.join(__dirname, "../../../public/uploads");
 
 	const csvfilePath = path.join(uploadFilesPath, "csvfile.csv");
@@ -137,8 +144,9 @@ async function handlefilupload(req, res) {
 
 	if (!isValid) {
 		return res.status(400).json({
-			error: "Missing required input data!",
-			isValidReqData: isValid,
+			testStatus: "falied",
+			testType: "file upload",
+			message: "missing required input data",
 		});
 	}
 
@@ -150,8 +158,7 @@ async function handlefilupload(req, res) {
 	const deviceId = await getDeviceId();
 
 	makePostReq(uploadUrl, file, deviceId).then((response) => {
-		unlinkFiles();
-		return res.status(response.statusCode).json(response);
+		return res.status(response.serverResponse.statusCode).json(response);
 	});
 }
 
