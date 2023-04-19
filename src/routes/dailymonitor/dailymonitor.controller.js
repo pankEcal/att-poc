@@ -35,14 +35,19 @@ function getRequestValues(requestBody) {
 	const { defaultStatus, defaultMessage } = getDefaultResopnseValues();
 	let responseData = new Object();
 
-	const { status, message } = requestBody;
+	if (!Boolean(requestBody)) {
+		responseData.userStatus = defaultStatus;
+		responseData.userMessage = defaultMessage;
+	} else {
+		const { status, message } = requestBody;
 
-	responseData.userStatus = Boolean(status !== undefined && status.toString())
-		? status.toString().trim()
-		: defaultStatus.toString().trim();
-	responseData.userMessage = Boolean(message !== undefined && message)
-		? message.trim()
-		: defaultMessage;
+		responseData.userStatus = Boolean(status)
+			? status.toString().trim()
+			: defaultStatus;
+		responseData.userMessage = Boolean(message)
+			? message.trim()
+			: defaultMessage;
+	}
 
 	return responseData;
 }

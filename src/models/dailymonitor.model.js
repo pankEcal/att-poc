@@ -1,5 +1,5 @@
 const defalutValues = {
-	defaultStatus: false,
+	defaultStatus: "false",
 	defaultMessage: "Incorrect url",
 };
 
