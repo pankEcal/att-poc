@@ -299,6 +299,13 @@ async function httpGetServerResponse(req, res) {
 
 // main function to proccess single application POST request
 async function httpGetBatchApplicationResponse(req, res) {
+	if (!req.body.application) {
+		return res.status(400).json({
+			status: "failed",
+			message: "Missing required input data!",
+		});
+	}
+
 	const requestedApplication = req.body.application.trim().toLowerCase();
 	const appsList = getApplicationsList().map((api) => api.toLowerCase());
 	const apis = getApisListWithApplication();
@@ -308,7 +315,6 @@ async function httpGetBatchApplicationResponse(req, res) {
 		const application = apis[applicationIndex];
 
 		let response = await getApplicationRespose(application);
-
 		return res.status(200).json(response);
 	} else {
 		return res.status(400).json({
