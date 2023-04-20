@@ -146,18 +146,18 @@ async function getApplicationRespose(app) {
 			await axios.get(url);
 		} catch (error) {
 			const {
-				response: {
-					data: { status, message },
-				},
+				response: { data },
 				request: {
-					res: { statusCode, responseUrl },
+					res: { statusCode, responseUrl, statusMessage },
+					method,
 				},
 			} = error;
 
 			const serverResMessage = {
-				serverStatus: status,
-				serverMessage: message,
+				serverStatus: data.status,
+				serverMessage: data.message,
 			};
+
 			const individualReqTimeTaken = Date.now() - individualReqStartTime;
 
 			let serverResponse = isExpectedErrorMessage(
@@ -165,30 +165,31 @@ async function getApplicationRespose(app) {
 				serverResMessage
 			)
 				? {
-						serverResponse: {
-							status: serverResMessage.serverStatus,
-							message: serverResMessage.serverMessage,
-						},
-						statusCode: statusCode,
-						testDuration: `${individualReqTimeTaken} ms`,
 						testStatus: "passed",
 						testType: "application urls batch request",
 						message: "user input and server response matched !",
-						url: responseUrl,
 						application: application,
+						testDuration: `${individualReqTimeTaken} ms`,
+						url: responseUrl,
+						method: method,
+						serverResponse: {
+							statusCode,
+							statusMessage,
+							...data,
+						},
 				  }
 				: {
-						serverResponse: {
-							status: serverResMessage.serverStatus,
-							message: serverResMessage.serverMessage,
-						},
-						statusCode: statusCode,
-						testDuration: `${individualReqTimeTaken} ms`,
 						testStatus: "failed",
 						testType: "application urls batch request",
 						message: "user input and server response not matching !!!",
 						application: application,
 						url: responseUrl,
+						method: method,
+						serverResponse: {
+							statusCode,
+							statusMessage,
+							...data,
+						},
 				  };
 
 			serverResponses.push(serverResponse);
