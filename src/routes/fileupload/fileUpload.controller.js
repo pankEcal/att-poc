@@ -122,7 +122,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 		} = error;
 
 		const errorResData = {
-			testStatus: "falied",
+			testStatus: "failed",
 			testType: "file upload",
 			message: message,
 			url: responseUrl,
@@ -156,7 +156,7 @@ async function handlefilupload(req, res) {
 
 	if (!isValid) {
 		return res.status(400).json({
-			testStatus: "falied",
+			testStatus: "failed",
 			testType: "file upload",
 			message: "missing required input data",
 		});
