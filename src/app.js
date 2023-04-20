@@ -18,4 +18,11 @@ app.use(bodyParser.json());
 app.use("/fileupload", fileUploadRouter);
 app.use("/dailymonitor", dailyMoniterRouter);
 
+app.get("/", (req, res) => {
+	return res.status(200).json({
+		status: "running",
+		message: "Hi, I'm ATT. Please follow documentation to get more info",
+	});
+});
+
 module.exports = app;
