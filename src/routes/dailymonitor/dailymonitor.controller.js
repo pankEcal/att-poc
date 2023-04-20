@@ -70,15 +70,17 @@ async function getBatchHttpResponse(responseBody) {
 			await axios.get(url);
 		} catch (error) {
 			const {
-				response: {
-					data: { status, message },
-				},
+				response: { data },
 				request: {
-					res: { statusCode, responseUrl },
+					res: { statusCode, responseUrl, statusMessage },
+					method,
 				},
 			} = error;
 
-			const serverResMessage = { serverStatus: status, serverMessage: message };
+			const serverResMessage = {
+				serverStatus: data.status,
+				serverMessage: data.message,
+			};
 			const individualReqTimeTaken = Date.now() - individualReqStartTime;
 
 			let serverResponse = isExpectedErrorMessage(
@@ -86,30 +88,31 @@ async function getBatchHttpResponse(responseBody) {
 				serverResMessage
 			)
 				? {
-						serverResponse: {
-							status: serverResMessage.serverStatus,
-							message: serverResMessage.serverMessage,
-						},
-						statusCode: statusCode,
-						testDuration: `${individualReqTimeTaken} ms`,
 						testStatus: "passed",
-						testType: "batch test request",
-						message: "user input and server response matched !",
-						url: responseUrl,
+						testType: "batch url request",
+						message: "user input and server response matched",
 						application: application,
+						testDuration: `${individualReqTimeTaken} ms`,
+						url: responseUrl,
+						method: method,
+						serverResponse: {
+							statusCode,
+							statusMessage,
+							...data,
+						},
 				  }
 				: {
-						serverResponse: {
-							status: serverResMessage.serverStatus,
-							message: serverResMessage.serverMessage,
-						},
-						statusCode: statusCode,
-						testDuration: `${individualReqTimeTaken} ms`,
 						testStatus: "failed",
 						testType: "batch test request",
-						message: "user input and server response not matching !!!",
+						message: "user input and server response didn't matched",
 						application: application,
 						url: responseUrl,
+						method: method,
+						serverResponse: {
+							statusCode,
+							statusMessage,
+							...data,
+						},
 				  };
 
 			serverResponses.push(serverResponse);
