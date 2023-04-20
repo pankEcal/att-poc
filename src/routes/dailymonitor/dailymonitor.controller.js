@@ -125,8 +125,27 @@ async function getBatchHttpResponse(responseBody) {
 	};
 }
 
+// returns boolean if the list of APIs in database includes passed URL or not
 function isValidUrl(request) {
 	return getApisList().includes(request.body.url);
+}
+
+// returns requested application name if it exists in database, else returns false
+function isValidApplication(requestedApplication) {
+	const userRequestedApplication = requestedApplication.trim().toLowerCase();
+	const appsList = getApplicationsList().map((api) => api.toLowerCase());
+	const apis = getApisListWithApplication();
+
+	const includesApplication = appsList.includes(userRequestedApplication);
+
+	if (!includesApplication) {
+		return false;
+	} else {
+		const applicationIndex = appsList.indexOf(userRequestedApplication);
+		const application = apis[applicationIndex];
+
+		return application;
+	}
 }
 
 async function getApplicationRespose(app) {
@@ -302,26 +321,23 @@ async function httpGetServerResponse(req, res) {
 async function httpGetBatchApplicationResponse(req, res) {
 	if (!req.body.application) {
 		return res.status(400).json({
-			status: "failed",
-			message: "Missing required input data!",
+			testStatus: "failed",
+			testType: "application urls batch request",
+			message: "Missing application name",
 		});
 	}
 
-	const requestedApplication = req.body.application.trim().toLowerCase();
-	const appsList = getApplicationsList().map((api) => api.toLowerCase());
-	const apis = getApisListWithApplication();
-
-	if (appsList.includes(requestedApplication)) {
-		const applicationIndex = appsList.indexOf(requestedApplication);
-		const application = apis[applicationIndex];
-
-		let response = await getApplicationRespose(application);
-		return res.status(200).json(response);
-	} else {
+	if (!isValidApplication(req.body.application)) {
 		return res.status(400).json({
-			status: "NOT OK",
+			testStatus: "failed",
+			testType: "application urls batch request",
+			message: "invalid application name",
 		});
 	}
+
+	const userRequestedApplication = isValidApplication(req.body.application);
+	const response = await getApplicationRespose(userRequestedApplication);
+	return res.status(200).json(response);
 }
 
 module.exports = {
