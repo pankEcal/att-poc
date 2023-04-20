@@ -135,6 +135,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 			},
 		};
 
+		clearFiles();
 		return errorResData;
 	}
 }
