@@ -248,9 +248,10 @@ async function httpGetBatchServerResponse(req, res) {
 async function httpGetServerResponse(req, res) {
 	const startTime = Date.now();
 
-	if (!includesUrl(req)) {
+	if (!req.body.url) {
 		return res.status(400).json({
 			testStatus: "failed",
+			testType: "individual url request",
 			message: "missing url input",
 		});
 	}
@@ -258,6 +259,7 @@ async function httpGetServerResponse(req, res) {
 	if (!isValidUrl(req)) {
 		return res.status(400).json({
 			testStatus: "failed",
+			testType: "individual url request",
 			message: "invalid url input",
 		});
 	}
@@ -273,45 +275,45 @@ async function httpGetServerResponse(req, res) {
 		// response is expected as 404 and is passed to error
 	} catch (error) {
 		const {
-			response: {
-				data: { status, message },
-			},
+			response: { data },
 			request: {
-				res: { statusCode, responseUrl },
+				res: { statusCode, responseUrl, statusMessage },
+				method,
 			},
 		} = error;
 
-		const serverResMessage = { serverStatus: status, serverMessage: message };
+		const serverResMessage = {
+			serverStatus: data.status,
+			serverMessage: data.message,
+		};
+
 		const timeTaken = Date.now() - startTime;
 
 		// return responses based on user requested values and server response values comparasion validation
 		return isExpectedErrorMessage(userReqValues, serverResMessage)
 			? res.status(statusCode).json({
-					data: {
-						serverResponse: {
-							status: serverResMessage.serverStatus,
-							message: serverResMessage.serverMessage,
-						},
-						statusCode: statusCode,
-						testDuration: `${timeTaken} ms`,
-						testStatus: "passed",
-						testType: "individual request",
-						message: "user input and server response matched !",
-						url: responseUrl,
+					testStatus: "passed",
+					testType: "individual url request",
+					message: "user input and server response matched",
+					testDuration: `${timeTaken} ms`,
+					url: responseUrl,
+					method: method,
+					serverResponse: {
+						statusCode,
+						statusMessage,
+						...data,
 					},
 			  })
 			: res.status(statusCode).json({
-					data: {
-						serverResponse: {
-							status: serverResMessage.serverStatus,
-							message: serverResMessage.serverMessage,
-						},
-						statusCode: statusCode,
-						testDuration: `${timeTaken} ms`,
-						testStatus: "failed",
-						testType: "individual request",
-						message: "user input and server response not matching !!!",
-						url: responseUrl,
+					testStatus: "failed",
+					testType: "individual url request",
+					message: "user input and server response didn't matched",
+					url: responseUrl,
+					method: method,
+					serverResponse: {
+						statusCode,
+						statusMessage,
+						...data,
 					},
 			  });
 	}
@@ -323,7 +325,7 @@ async function httpGetBatchApplicationResponse(req, res) {
 		return res.status(400).json({
 			testStatus: "failed",
 			testType: "application urls batch request",
-			message: "Missing application name",
+			message: "missing application name",
 		});
 	}
 
