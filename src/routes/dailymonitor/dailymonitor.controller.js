@@ -271,7 +271,6 @@ async function httpGetServerResponse(req, res) {
 
 	try {
 		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
-
 		let serverResponse = await axios.get(req.body.url);
 
 		// not performing actions because:
@@ -294,7 +293,7 @@ async function httpGetServerResponse(req, res) {
 
 		// return responses based on user requested values and server response values comparasion validation
 		return isExpectedErrorMessage(userReqValues, serverResMessage)
-			? res.status(statusCode).json({
+			? res.status(200).json({
 					testStatus: "passed",
 					testType: "individual url request",
 					message: "user input and server response matched",
@@ -307,7 +306,7 @@ async function httpGetServerResponse(req, res) {
 						...data,
 					},
 			  })
-			: res.status(statusCode).json({
+			: res.status(400).json({
 					testStatus: "failed",
 					testType: "individual url request",
 					message: "user input and server response didn't matched",
@@ -342,7 +341,7 @@ async function httpGetBatchApplicationResponse(req, res) {
 
 	const userRequestedApplication = isValidApplication(req.body.application);
 	const response = await getApplicationRespose(userRequestedApplication);
-	return res.status(200).json(response);
+	return res.json(response);
 }
 
 module.exports = {
