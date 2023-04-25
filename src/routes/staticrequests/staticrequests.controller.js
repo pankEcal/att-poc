@@ -1,6 +1,7 @@
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
+const FormData = require("form-data");
 
 // method to remove the uploaded files from client side
 async function clearFiles() {
@@ -40,17 +41,32 @@ async function makeHttpReq(req) {
 	}
 
 	try {
-		const serverResponse = await axios.post(baseUrl + apiLink, {
-			...rest,
-			file,
-		});
-		const { data, status } = serverResponse;
+		if (Boolean(file)) {
+			let formDataInfo = new FormData();
+			for (const key in rest) {
+				formDataInfo.append(key, rest[key]);
+			}
 
-		clearFiles();
-		return { data, status };
+			formDataInfo.append("csvfile", fs.createReadStream(file.path));
+			const serverResponse = await axios.post(baseUrl + apiLink, formDataInfo);
+			const { data, status } = serverResponse;
+
+			return { data, status };
+		} else {
+			const serverResponse = await axios.post(baseUrl + apiLink, {
+				...rest,
+			});
+
+			const { data, status } = serverResponse;
+
+			if (file) {
+				clearFiles();
+			}
+			return { data, status };
+		}
 	} catch (error) {
-		console.log(error);
-		return error;
+		const data = { status: false, message: error.message };
+		return { data, status: 400 };
 	}
 }
 
