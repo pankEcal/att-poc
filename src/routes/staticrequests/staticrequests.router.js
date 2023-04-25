@@ -21,12 +21,17 @@ const storage = multer.diskStorage({
 		callback(null, fileUploadPath);
 	},
 	filename: (req, file, callback) => {
-		callback(null, "csvfile.csv");
+		const fileExtension = file.originalname.split(".")[1];
+		callback(null, `uploadedFile.${fileExtension}`);
 	},
 });
 
 const upload = multer({ storage });
 
-staticRequestsRoute.post("/", upload.single("csvfile"), httpGeStaticRequest);
+staticRequestsRoute.post(
+	"/",
+	upload.single("uploadedFile"),
+	httpGeStaticRequest
+);
 
 module.exports = staticRequestsRoute;
