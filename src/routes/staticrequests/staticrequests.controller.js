@@ -29,7 +29,7 @@ function validate(validationParams, serverResponses) {
 	resultsMap.set("failed", 0);
 
 	// check if validation params are present or not, if not then it will be handled inside the block, and won't proceed further
-	if (!validationParams) {
+	if (!validationParams || !Object.entries(validationParams).length) {
 		Object.assign(validationMessage, {
 			validationMessage: "validation check skipped. No values passed.",
 		});
@@ -75,9 +75,8 @@ function validate(validationParams, serverResponses) {
 // method to make POST request to the requested server, and send back the data to main function
 async function makeHttpReq(req) {
 	// check if request body is empty, if it's empty then don't proceed further
-	if (!Boolean(Object.keys(req.body).length)) {
+	if (!Object.keys(req.body).length) {
 		const data = { status: false, message: "missing required input data" };
-
 		return { data, status: 400 };
 	}
 
