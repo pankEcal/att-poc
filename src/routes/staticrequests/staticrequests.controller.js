@@ -29,7 +29,7 @@ async function makeHttpReq(req) {
 	}
 
 	const {
-		body: { baseUrl, apiLink, ...rest },
+		body: { baseUrl, apiLink, ...reqParams },
 		file,
 	} = req;
 
@@ -42,8 +42,8 @@ async function makeHttpReq(req) {
 
 	try {
 		let formDataInfo = new FormData();
-		for (const key in rest) {
-			formDataInfo.append(key, rest[key]);
+		for (const key in reqParams) {
+			formDataInfo.append(key, reqParams[key]);
 		}
 		if (Boolean(file)) {
 			formDataInfo.append("csvfile", fs.createReadStream(file.path));
