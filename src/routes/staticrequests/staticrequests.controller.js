@@ -85,11 +85,13 @@ async function makeHttpReq(req) {
 	try {
 		// if file is uploaded from client side, then it will be handled in this block
 		if (req.file) {
+			// get required data from request body to make request
 			const {
 				body: { baseUrl, apiLink, ...requestParams },
 				file,
 			} = req;
 
+			// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
 			if (!baseUrl || !apiLink) {
 				return {
 					status: false,
@@ -97,16 +99,22 @@ async function makeHttpReq(req) {
 				};
 			}
 
+			// create a new formData object instance to handle file uploading
 			let formDataInput = new FormData();
+			// append the uploaded file and body params into the created formData
 			formDataInput.append("csvfile", fs.createReadStream(file.path));
-
 			for (key in requestParams) {
 				formDataInput.append(key, requestParams[key]);
 			}
 
+			// if  baseUrl and apiLink fields are non-empty then make POST request with the created formData
 			const serverResponse = await axios.post(baseUrl + apiLink, formDataInput);
+			// get server response after making POST requst to the provided URL
 			const { data, status } = serverResponse;
+			// clear the file content after getting server response
+			clearFiles();
 
+			// return server response data, and server responded statusCode
 			return { data, status };
 		}
 
