@@ -1,6 +1,7 @@
 const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
+const FormData = require("form-data");
 
 // method to remove the uploaded files from client side
 async function clearFiles() {
@@ -21,24 +22,38 @@ async function clearFiles() {
 
 async function makeHttpReq(req) {
 	if (!Boolean(Object.keys(req.body).length)) {
-		return {
-			status: false,
-			message: "missing required input data",
-		};
-	}
+		const data = { status: "false", message: "missing required input data" };
 
-	const {
-		body: { baseUrl, apiLink, requestParams },
-	} = req;
-
-	if (!baseUrl || !apiLink) {
-		return {
-			status: false,
-			message: "URL input invalid or incomplete",
-		};
+		return { data, status: 400 };
 	}
 
 	try {
+		if (req.file) {
+			const {
+				body: { baseUrl, apiLink, ...requestParams },
+				file,
+			} = req;
+
+			if (!baseUrl || !apiLink) {
+				return {
+					status: false,
+					message: "URL input invalid or incomplete",
+				};
+			}
+
+			let formDataInput = new FormData();
+			formDataInput.append("csvfile", fs.createReadStream(file.path));
+
+			for (key in requestParams) {
+				formDataInput.append(key, requestParams[key]);
+			}
+
+			const serverResponse = await axios.post(baseUrl + apiLink, formDataInput);
+			const { data, status } = serverResponse;
+
+			return { data, status };
+		}
+
 		const serverResponse = await axios.post(baseUrl + apiLink, requestParams, {
 			headers: { "Content-Type": "application/json" },
 		});
@@ -46,8 +61,8 @@ async function makeHttpReq(req) {
 
 		return { data, status };
 	} catch (error) {
-		const data = { status: false, message: error.message };
-		return { data, status: 400 };
+		const data = { status: "false", message: error.message };
+		return { ...data, status: 400 };
 	}
 }
 
