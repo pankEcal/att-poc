@@ -41,20 +41,23 @@ async function makeHttpReq(req) {
 	}
 
 	try {
+		let formDataInfo = new FormData();
+		for (const key in rest) {
+			formDataInfo.append(key, rest[key]);
+		}
 		if (Boolean(file)) {
-			let formDataInfo = new FormData();
-			for (const key in rest) {
-				formDataInfo.append(key, rest[key]);
-			}
-
 			formDataInfo.append("csvfile", fs.createReadStream(file.path));
-			const serverResponse = await axios.post(baseUrl + apiLink, formDataInfo);
+			const serverResponse = await axios.post(baseUrl + apiLink, formDataInfo, {
+				headers: { "Content-Type": "multipart/form-data" },
+				transformRequest: (formDataInfo) => formDataInfo,
+			});
 			const { data, status } = serverResponse;
 
 			return { data, status };
 		} else {
-			const serverResponse = await axios.post(baseUrl + apiLink, {
-				...rest,
+			const serverResponse = await axios.post(baseUrl + apiLink, formDataInfo, {
+				headers: { "Content-Type": "multipart/form-data" },
+				transformRequest: (formDataInfo) => formDataInfo,
 			});
 
 			const { data, status } = serverResponse;
