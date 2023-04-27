@@ -31,7 +31,9 @@ function validate(validationParams, serverResponses) {
 	// check if validation params are present or not, if not then it will be handled inside the block, and won't proceed further
 	if (!validationParams || !Object.entries(validationParams).length) {
 		Object.assign(validationMessage, {
-			validationMessage: "validation check skipped. No values passed.",
+			status: false,
+			validated: false,
+			message: "validation check skipped. No values passed.",
 		});
 
 		return validationMessage;
@@ -58,13 +60,15 @@ function validate(validationParams, serverResponses) {
 	// passing condition: at least 1 passing case should be there and no failed case should be present.
 	if (resultsMap.get("passed") >= 1 && resultsMap.get("failed") === 0) {
 		Object.assign(validationMessage, {
-			validationMessage:
-				"validation check passed. User input and server response is matching",
+			status: true,
+			validated: true,
+			message: "User input and server response is matching",
 		});
 	} else {
 		Object.assign(validationMessage, {
-			validationMessage:
-				"validation check failed. User input and server response not matching",
+			status: false,
+			validated: true,
+			message: "User input and server response not matching",
 		});
 	}
 
@@ -76,7 +80,9 @@ function validate(validationParams, serverResponses) {
 async function makeHttpReq(req) {
 	// check if request body is empty, if it's empty then don't proceed further
 	if (!Object.keys(req.body).length) {
-		const data = { status: false, message: "missing required input data" };
+		const data = {
+			testResult: { status: false, message: "missing required input data" },
+		};
 		return { data, status: 400 };
 	}
 
@@ -134,9 +140,16 @@ async function makeHttpReq(req) {
 
 		// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
 		if (!baseUrl || !apiLink) {
+			const data = {
+				testResult: {
+					status: false,
+					message: "invalid or incomplete URL input",
+				},
+			};
+
 			return {
-				status: false,
-				message: "URL inputs invalid or incomplete",
+				data,
+				status: 400,
 			};
 		}
 
@@ -149,9 +162,15 @@ async function makeHttpReq(req) {
 		const { data, status } = serverResponse;
 		// get validation message
 		const validationMessage = validate(validationParams, data);
+		const testResult = {
+			status: validationMessage.validated ? validationMessage.status : true,
+		};
 
-		// return server response data, validation message, and server responded statusCode
-		return { data: { ...data, ...validationMessage }, status };
+		// return testResult, server response data, validation message, and server responded statusCode
+		return {
+			data: { testResult, serverResponse: data, validationMessage },
+			status,
+		};
 	} catch (error) {
 		// if error is occured then pass the message and status codes accordingly
 		const data = { status: false, message: error.message };
