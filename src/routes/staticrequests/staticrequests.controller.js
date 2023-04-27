@@ -186,8 +186,23 @@ async function makeHttpReq(req) {
 		};
 	} catch (error) {
 		// if error is occured then pass the message and status codes accordingly
-		const data = { success: false, message: error.message };
-		return { ...data, status: 400 };
+		const {
+			response: { status },
+			config: { url },
+			request: { method },
+			message,
+		} = error;
+
+		const data = {
+			testResult: {
+				url: url,
+				success: false,
+				method: method,
+				message: message,
+			},
+			error,
+		};
+		return { data, status: status };
 	}
 }
 
