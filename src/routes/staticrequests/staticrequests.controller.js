@@ -31,7 +31,7 @@ function validate(validationParams, serverResponses) {
 	// check if validation params are present or not, if not then it will be handled inside the block, and won't proceed further
 	if (!validationParams || !Object.entries(validationParams).length) {
 		Object.assign(validationMessage, {
-			status: false,
+			success: false,
 			validated: false,
 			message: "validation check skipped. No values passed.",
 		});
@@ -60,13 +60,13 @@ function validate(validationParams, serverResponses) {
 	// passing condition: at least 1 passing case should be there and no failed case should be present.
 	if (resultsMap.get("passed") >= 1 && resultsMap.get("failed") === 0) {
 		Object.assign(validationMessage, {
-			status: true,
+			success: true,
 			validated: true,
 			message: "User input and server response is matching",
 		});
 	} else {
 		Object.assign(validationMessage, {
-			status: false,
+			success: false,
 			validated: true,
 			message: "User input and server response not matching",
 		});
@@ -81,7 +81,7 @@ async function makeHttpReq(req) {
 	// check if request body is empty, if it's empty then don't proceed further
 	if (!Object.keys(req.body).length) {
 		const data = {
-			testResult: { status: false, message: "missing required input data" },
+			testResult: { success: false, message: "missing required input data" },
 		};
 		return { data, status: 400 };
 	}
@@ -100,7 +100,7 @@ async function makeHttpReq(req) {
 			// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
 			if (!baseUrl || !apiLink) {
 				return {
-					status: false,
+					success: false,
 					message: "URL input invalid or incomplete",
 				};
 			}
@@ -130,7 +130,7 @@ async function makeHttpReq(req) {
 
 			const testResult = {
 				url: baseUrl + apiLink,
-				status: validationMessage.validated ? validationMessage.status : true,
+				success: validationMessage.validated ? validationMessage.success : true,
 				method: req.method,
 			};
 
@@ -153,7 +153,7 @@ async function makeHttpReq(req) {
 		if (!baseUrl || !apiLink) {
 			const data = {
 				testResult: {
-					status: false,
+					success: false,
 					message: "invalid or incomplete URL input",
 				},
 			};
@@ -175,7 +175,7 @@ async function makeHttpReq(req) {
 		const validationMessage = validate(validationParams, data);
 		const testResult = {
 			url: baseUrl + apiLink,
-			status: validationMessage.validated ? validationMessage.status : true,
+			success: validationMessage.validated ? validationMessage.success : true,
 			method: req.method,
 		};
 
@@ -186,7 +186,7 @@ async function makeHttpReq(req) {
 		};
 	} catch (error) {
 		// if error is occured then pass the message and status codes accordingly
-		const data = { status: false, message: error.message };
+		const data = { success: false, message: error.message };
 		return { ...data, status: 400 };
 	}
 }
