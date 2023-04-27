@@ -126,11 +126,22 @@ async function makeHttpReq(req) {
 
 			// get server response after making POST requst to the provided URL
 			const { data, status } = serverResponse;
+			const validationMessage = validate(requestParams, data);
+
+			const testResult = {
+				url: baseUrl + apiLink,
+				status: validationMessage.validated ? validationMessage.status : true,
+				method: req.method,
+			};
+
 			// clear the file content after getting server response
 			clearFiles();
 
-			// return server response data, and server responded statusCode
-			return { data, status };
+			// return testResult, server response data, validation message, and server responded statusCode
+			return {
+				data: { testResult, serverResponse: data, validationMessage },
+				status,
+			};
 		}
 
 		// get required data from request body to make request
