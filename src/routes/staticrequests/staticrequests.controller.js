@@ -88,6 +88,7 @@ async function makeHttpReq(req) {
 			const {
 				body: { baseUrl, apiLink, ...requestParams },
 				file,
+				headers,
 			} = req;
 
 			// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
@@ -107,7 +108,16 @@ async function makeHttpReq(req) {
 			}
 
 			// if  baseUrl and apiLink fields are non-empty then make POST request with the created formData
-			const serverResponse = await axios.post(baseUrl + apiLink, formDataInput);
+			const serverResponse = await axios.post(
+				baseUrl + apiLink,
+				formDataInput,
+				{
+					headers: {
+						authorization: headers.authorization ? headers.authorization : null,
+					},
+				}
+			);
+
 			// get server response after making POST requst to the provided URL
 			const { data, status } = serverResponse;
 			// clear the file content after getting server response
