@@ -5,19 +5,34 @@ const FormData = require("form-data");
 
 // method to remove the uploaded files from client side
 async function clearFiles() {
-	const uploadFilesPath = path.join(__dirname, "../../../public/uploads");
+	const basePath = path.join(__dirname, "../../../public/uploads/");
+	const uploadedFiles = [];
 
-	const uploadedFilePath = path.join(
-		uploadFilesPath,
-		fs.readdirSync(uploadFilesPath)[0]
-	);
+	fs.readdirSync(basePath).map((filename) => {
+		uploadedFiles.push(basePath + filename);
+	});
 
-	fs.access(uploadFilesPath, (error) => {
+	fs.access(basePath, (error) => {
 		if (!error) {
-			const uploadedFileStrem = fs.createWriteStream(uploadedFilePath);
-			uploadedFileStrem.write("");
+			uploadedFiles.map((file) => {
+				fs.createWriteStream(file).write("");
+			});
 		}
 	});
+
+	// method to remove the file
+	// blocked by Error: EPERM: operation not permitted error
+
+	// fs.access(basePath, (error) => {
+	// 	if (!error) {
+	// 		uploadedFiles.map((file) => {
+	// 			fs.unlink(file, (error) => {
+	// 				if (error) console.log(error.message);
+	// 				console.log(`${file} deleted!`);
+	// 			});
+	// 		});
+	// 	}
+	// });
 }
 
 // method to reutrn validation message based on the values passed
