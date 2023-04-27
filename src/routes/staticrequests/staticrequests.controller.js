@@ -163,7 +163,9 @@ async function makeHttpReq(req) {
 		// get validation message
 		const validationMessage = validate(validationParams, data);
 		const testResult = {
+			url: baseUrl + apiLink,
 			status: validationMessage.validated ? validationMessage.status : true,
+			method: req.method,
 		};
 
 		// return testResult, server response data, validation message, and server responded statusCode
@@ -184,8 +186,15 @@ async function makeHttpReq(req) {
 
 // method to make POST request to server and give response back
 async function httpGeStaticRequest(req, res) {
+	// record starting time before running test to track the total time taken
+	const startingTime = Date.now();
+
 	// collecting response coming from the requested server side, and sending respose back to client side
 	const { data, status } = await makeHttpReq(req);
+
+	Object.assign(data.testResult, {
+		testDuration: `${Date.now() - startingTime} ms`,
+	});
 
 	return res.status(status).json({
 		...data,
