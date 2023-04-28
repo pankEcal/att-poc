@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 /* Implementing routes */
 app.use("/fileupload", fileUploadRouter);
 app.use("/dailymonitor", dailyMoniterRouter);
-app.use("/staticreq", staticRequestsRouter);
+app.use("/hardcoded", staticRequestsRouter);
 
 app.get("/", (req, res) => {
 	return res.status(200).json({
