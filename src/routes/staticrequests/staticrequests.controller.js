@@ -161,7 +161,13 @@ async function makeHttpReq(req) {
 
 		// get required data from request body to make request
 		const {
-			body: { baseUrl, apiLink, requestParams, validationParams },
+			body: {
+				baseUrl,
+				apiLink,
+				requestMethod = undefined,
+				requestParams,
+				validationParams,
+			},
 		} = req;
 
 		// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
@@ -179,10 +185,51 @@ async function makeHttpReq(req) {
 			};
 		}
 
+		if (!Boolean(requestMethod)) {
+			const data = {
+				testResult: {
+					success: false,
+					message: "request method not provided",
+				},
+			};
+
+			return {
+				data,
+				status: 400,
+			};
+		} else if (
+			String(requestMethod).toUpperCase() != "GET" &&
+			String(requestMethod).toUpperCase() != "POST"
+		) {
+			const data = {
+				testResult: {
+					success: false,
+					message: "invalid request method",
+				},
+			};
+
+			return {
+				data,
+				status: 400,
+			};
+		}
+
+		let serverResponse = {};
+
+		// handle GET method
+		if (requestMethod === "GET") {
+			// if  baseUrl and apiLink fields are non-empty then make POST request with the provided request body
+			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
+			const response = await axios.get(baseUrl + apiLink);
+			Object.assign(serverResponse, response);
+		}
+
+		// handle POST method. If it's not GET then it's POST only as validation is already done
 		// if  baseUrl and apiLink fields are non-empty then make POST request with the provided request body
-		const serverResponse = await axios.post(baseUrl + apiLink, requestParams, {
+		response = await axios.post(baseUrl + apiLink, requestParams, {
 			headers: { "Content-Type": "application/json" },
 		});
+		Object.assign(serverResponse, response);
 
 		// get server response after making POST requst to the provided URL
 		const { data, status } = serverResponse;
@@ -203,8 +250,8 @@ async function makeHttpReq(req) {
 		// if error is occured then pass the message and status codes accordingly
 		const {
 			response: { status } = {}, // if response.status === undefined, in that case assign it as an empty object
-			config: { url },
-			request: { method },
+			config: { url } = {}, // if response.config === undefined, in that case assign it as an empty object
+			request: { method } = {}, // if response.request === undefined, in that case assign it as an empty object
 			message,
 		} = error;
 
