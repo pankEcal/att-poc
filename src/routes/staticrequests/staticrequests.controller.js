@@ -202,7 +202,7 @@ async function makeHttpReq(req) {
 	} catch (error) {
 		// if error is occured then pass the message and status codes accordingly
 		const {
-			response: { status },
+			response: { status } = {}, // if response.status === undefined, in that case assign it as an empty object
 			config: { url },
 			request: { method },
 			message,
@@ -217,7 +217,7 @@ async function makeHttpReq(req) {
 			},
 			error,
 		};
-		return { data, status: status };
+		return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
 	}
 }
 
