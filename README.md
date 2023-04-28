@@ -8,7 +8,11 @@
   - [**File Upload APIs**](#file-upload-apis)
     - [1. GET `/fileupload`](#1-get-fileupload)
     - [2. POST `/fileupload`](#2-post-fileupload)
+  - [**Hardcoded Upload APIs**](#hardcoded-upload-apis)
+    - [1. POST `/hardcoded`](#1-post-hardcoded)
 - [**Determining Test Result**](#determining-test-result)
+  - [for File Upload APIs and Daily monitor APIs](#for-file-upload-apis-and-daily-monitor-apis)
+  - [for Hardcoded Upload APIs](#for-hardcoded-upload-apis)
 
 ## **Setting up the app in local environment**
 
@@ -354,6 +358,179 @@ Sample response for missing requierd input data case:
 }
 ```
 
+### **Hardcoded Upload APIs**
+
+The API will perform tests based on the data provided from client side. The data will include the url to test with, params to provide to the url and also the validation data if validation has to be performed.
+
+#### 1. POST `/hardcoded`
+
+It has 2 major parts of performing tests.
+
+1. tests related to file uploading
+2. tests not related to file uploading
+
+**Expected fields for tests related to file uploading:**
+
+NOTE: The fields are expected to be passed as form data.
+
+1. `baseUrl`: (mandatory) is base url of the API being tested.
+2. `apiLink`: (mandatory) is the rest part of the API being tested.
+3. `csvfile`: (mandatory) is the csv file being uploaded on the API.
+
+NOTE: Fields other than mandatory fields are considered as validation fields. The test result will be determined based on that.
+
+> If any header is required to be passed then it has to be passed as standard request header while sending the request.
+
+**Expected fields for tests related to file uploading:**
+
+NOTE: The fields are expected to be passed in JSON format
+
+1. `baseUrl`: (mandatory) is base url of the API being tested.
+2. `apiLink`: (mandatory) is the rest part of the API being tested.
+3. `requestParams`: is the field which consists all the required parameters to make valid request to the API.
+4. `validationParams`: is the field which consists all the required parameters to validate the server response received from server side of the tested API. If the field is missing or empty, then validation check will be skipped.
+
+**Understanding JSON response**
+
+The test response will have mandatory `testResult` field which includes data related to test result.
+
+---
+
+Upon hitting the API successfully, it will have `serverResponse` and `validationMessage` fields respectively which holds response received from server and validation status respectively.
+
+example: making request to valid url with valid params but passing wrong validation params.
+
+request params:
+
+```JSON
+{
+    "baseUrl": "https://evaai.enginecal.com/",
+    "apiLink": "core/v1/bike-intell/checklogin",
+    "requestParams": {
+        "u": "saurabh.singh@enginecal.com",
+        "p": "12345"
+    },
+    "validationParams": {
+        "errorCode": "1003"
+    }
+}
+```
+
+test response:
+
+```JSON
+{
+    "testResult": {
+        "url": "https://evaai.enginecal.com/core/v1/bike-intell/checklogin",
+        "success": false,
+        "method": "POST",
+        "testDuration": "709 ms"
+    },
+    "serverResponse": {
+        "success": false,
+        "errorCode": "1002",
+        "errorMessage": "Invalid Username or Password!"
+    },
+    "validationMessage": {
+        "success": false,
+        "validated": true,
+        "message": "User input and server response not matching"
+    }
+}
+```
+
+---
+
+In case of error which was not able to be handled by the request, it will have `error` field which will include all the information received related to the error instance.
+
+example: making request to invalid url with valid params which is ideally a error condition.
+
+request params:
+
+```JSON
+{
+    "baseUrl": "https://evaai.enginecal.com/",
+    "apiLink": "core/v1/bike-intell/checklogsin",
+    "requestParams": {
+        "u": "saurabh.singh@enginecal.com",
+        "p": "12345"
+    },
+    "validationParams": {
+        "errorCode": "1003"
+    }
+}
+```
+
+test response:
+
+```JSON
+{
+    "testResult": {
+        "url": "https://evaai.enginecal.com/core/v1/bike-intell/checklogsin",
+        "success": false,
+        "method": "POST",
+        "message": "Request failed with status code 404",
+        "testDuration": "489 ms"
+    },
+    "error": {
+        "message": "Request failed with status code 404",
+        "name": "AxiosError",
+        "stack": "AxiosError: Request failed with status code 404\n    at settle (C:\\Users\\Admin\\Desktop\\pankaj\\NodeJs\\att-poc\\node_modules\\axios\\dist\\node\\axios.cjs:1900:12)\n    at IncomingMessage.handleStreamEnd (C:\\Users\\Admin\\Desktop\\pankaj\\NodeJs\\att-poc\\node_modules\\axios\\dist\\node\\axios.cjs:2952:11)\n    at IncomingMessage.emit (node:events:402:35)\n    at endReadableNT (node:internal/streams/readable:1343:12)\n    at processTicksAndRejections (node:internal/process/task_queues:83:21)",
+        "config": {
+            "transitional": {
+                "silentJSONParsing": true,
+                "forcedJSONParsing": true,
+                "clarifyTimeoutError": false
+            },
+            "adapter": [
+                "xhr",
+                "http"
+            ],
+            "transformRequest": [
+                null
+            ],
+            "transformResponse": [
+                null
+            ],
+            "timeout": 0,
+            "xsrfCookieName": "XSRF-TOKEN",
+            "xsrfHeaderName": "X-XSRF-TOKEN",
+            "maxContentLength": -1,
+            "maxBodyLength": -1,
+            "env": {
+                "Blob": null
+            },
+            "headers": {
+                "Accept": "application/json, text/plain, */*",
+                "Content-Type": "application/json",
+                "User-Agent": "axios/1.3.4",
+                "Content-Length": "47",
+                "Accept-Encoding": "gzip, compress, deflate, br"
+            },
+            "method": "post",
+            "url": "https://evaai.enginecal.com/core/v1/bike-intell/checklogsin",
+            "data": "{\"u\":\"saurabh.singh@enginecal.com\",\"p\":\"12345\"}"
+        },
+        "code": "ERR_BAD_REQUEST",
+        "status": 404
+    }
+}
+```
+
 ## **Determining Test Result**
 
+### for File Upload APIs and Daily monitor APIs
+
 After running test, The test request will respond with JSON data as shown in the sample responses. The key `testStatus` indicates wheather the test was passed or not based on the test logic was implemented. Test is passed for the value `passed` and failed for the value `failed`. No other parameters are deciding part of any of the test result.
+
+### for Hardcoded Upload APIs
+
+The field `testResult` is where the test result is holded. Inside of it, value of the boolean `success` field determines the test result.(i.e: passed for `true` and `false` for false)
+
+---
+
+Also, the field `validationMessage` holds result related to validation separately.
+
+If the `validationParams` field isn't passed or is empty while making request, validation won't be performed and it will be considered as failed validation. The `validated` field value will be `false` in such case and `success` will also be `false`.
+
+If the `validationParams` field is passed and is not empty while making request, then `validated` field will be `true` and `success` will be `true` or `false` based on the values passed to to the field. The value of `success` field in `testResult` is directly proportional to the value of `success` field in `validationParams`.
