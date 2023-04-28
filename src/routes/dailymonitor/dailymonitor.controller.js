@@ -24,7 +24,7 @@ function isExpectedErrorMessage(userRequest, serverResponse) {
 	// status is expected in boolean but it can respond differently with the conditional statemetns. Due to that reason, it is converted to string for comparasion only
 	// check the lower cased value of the message to make validation more general
 	const includesExpectedMessage =
-		userStatus === serverStatus.toString() &&
+		userStatus === serverStatus?.toString() &&
 		userMessage.toLowerCase() === serverMessage.toLowerCase();
 
 	return includesExpectedMessage;
@@ -70,7 +70,7 @@ async function getBatchHttpResponse(responseBody) {
 			await axios.get(url);
 		} catch (error) {
 			const {
-				response: { data },
+				response: { data } = {},
 				request: {
 					res: { statusCode, responseUrl, statusMessage },
 					method,
