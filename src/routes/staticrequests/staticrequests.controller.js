@@ -222,14 +222,14 @@ async function makeHttpReq(req) {
 			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
 			const response = await axios.get(baseUrl + apiLink);
 			Object.assign(serverResponse, response);
+		} else if (requestMethod === "POST") {
+			// handle POST method. If it's not GET then it's POST only as validation is already done
+			// if  baseUrl and apiLink fields are non-empty then make POST request with the provided request body
+			response = await axios.post(baseUrl + apiLink, requestParams, {
+				headers: { "Content-Type": "application/json" },
+			});
+			Object.assign(serverResponse, response);
 		}
-
-		// handle POST method. If it's not GET then it's POST only as validation is already done
-		// if  baseUrl and apiLink fields are non-empty then make POST request with the provided request body
-		response = await axios.post(baseUrl + apiLink, requestParams, {
-			headers: { "Content-Type": "application/json" },
-		});
-		Object.assign(serverResponse, response);
 
 		// get server response after making POST requst to the provided URL
 		const { data, status } = serverResponse;
