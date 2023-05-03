@@ -216,7 +216,7 @@ async function makeHttpReq(req) {
 
 		let serverResponse = {};
 
-		// handle GET method
+		// handle request methods and populate data to serverResponse
 		if (requestMethod === "GET") {
 			// if  baseUrl and apiLink fields are non-empty then make POST request with the provided request body
 			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
@@ -235,9 +235,15 @@ async function makeHttpReq(req) {
 		const { data, status } = serverResponse;
 		// get validation message
 		const validationMessage = validate(validationParams, data);
+		// conditions to validate test status
+		const isPassingServerResponse = status === 200 && data.success === true;
+		const isPassingValidation = validationMessage.validated
+			? validationMessage.success
+			: true;
+
 		const testResult = {
 			url: baseUrl + apiLink,
-			success: validationMessage.validated ? validationMessage.success : true,
+			success: isPassingServerResponse && isPassingValidation ? true : false,
 			method: req.method,
 		};
 
