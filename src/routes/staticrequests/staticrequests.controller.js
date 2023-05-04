@@ -240,15 +240,18 @@ async function makeHttpReq(req) {
 		const { data, status } = serverResponse;
 		// get validation message
 		const validationMessage = validate(validationParams, data);
-		// conditions to validate test status
+
+		// condition to validate test status
+		// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
+		// if validation param isn't passed then test result will be thrown based on server response.
 		const isPassingServerResponse = status === 200 && data.success === true;
-		const isPassingValidation = validationMessage.validated
+		const teststatus = validationMessage.validated
 			? validationMessage.success
-			: true;
+			: isPassingServerResponse;
 
 		const testResult = {
 			url: baseUrl + apiLink,
-			success: isPassingServerResponse && isPassingValidation ? true : false,
+			success: teststatus,
 			method: req.method,
 		};
 
