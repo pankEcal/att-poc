@@ -276,7 +276,7 @@ async function makeHttpReq(req) {
 				method: method,
 				message: message,
 			},
-			error,
+			serverResponse: error,
 		};
 		return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
 	}
