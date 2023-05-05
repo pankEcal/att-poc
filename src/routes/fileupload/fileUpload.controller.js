@@ -3,10 +3,11 @@ const path = require("path");
 const fs = require("fs");
 const { parse } = require("csv-parse");
 const FormData = require("form-data");
+const { clearFiles } = require("../../utils/clearFiles");
 
 // method to verify if request has expected data value or not
 function isValidReqData(request) {
-	if (!request.body && !request.file) {
+	if (!request.body || !request.file) {
 		return false;
 	} else {
 		const {
@@ -16,24 +17,6 @@ function isValidReqData(request) {
 
 		return Boolean(file) && Boolean(uploadUrl);
 	}
-}
-
-// method to remove the uploaded files from client side
-function clearFiles() {
-	const uploadFilesPath = path.join(__dirname, "../../../public/uploads");
-
-	const csvfilePath = path.join(uploadFilesPath, "csvfile.csv");
-	const deviceIdFilePath = path.join(uploadFilesPath, "deviceid.txt");
-
-	fs.access(uploadFilesPath, (error) => {
-		if (!error) {
-			const csvWriteStream = fs.createWriteStream(csvfilePath);
-			csvWriteStream.write("");
-
-			const devIdWriteStream = fs.createWriteStream(deviceIdFilePath);
-			devIdWriteStream.write("");
-		}
-	});
 }
 
 // read csv file and return device ID
@@ -162,7 +145,6 @@ async function handlefilupload(req, res) {
 			message: "missing required input data",
 		});
 	}
-
 	const {
 		body: { uploadUrl },
 		file,
@@ -170,7 +152,7 @@ async function handlefilupload(req, res) {
 
 	const deviceId = await getDeviceId();
 
-	makePostReq(uploadUrl, file, deviceId).then((response) => {
+	return await makePostReq(uploadUrl, file, deviceId).then((response) => {
 		return res.status(response.serverResponse.statusCode).json(response);
 	});
 }
