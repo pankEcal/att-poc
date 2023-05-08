@@ -101,7 +101,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 				method = null,
 				res: { responseUrl, statusCode } = {
 					responseUrl: uploadUrl,
-					statusCode: 500,
+					statusCode: 502,
 				},
 			},
 		} = error;
