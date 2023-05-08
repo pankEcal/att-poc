@@ -92,15 +92,17 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 		return responseData;
 	} catch (error) {
 		const {
-			message,
-			response: {
-				statusText,
-				headers: { date },
-				data,
+			message = null,
+			response: { statusText, headers: { date } = { date: null }, data } = {
+				statusText: null,
+				data: null,
 			},
 			request: {
-				method,
-				res: { responseUrl, statusCode },
+				method = null,
+				res: { responseUrl, statusCode } = {
+					responseUrl: uploadUrl,
+					statusCode: 500,
+				},
 			},
 		} = error;
 
@@ -119,6 +121,7 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 		};
 
 		clearFiles();
+
 		return errorResData;
 	}
 }
