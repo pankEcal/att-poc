@@ -3,7 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const { httpGetIndividualRes } = require("./staticrequests.controller");
+const { httpGetIndividualRes } = require("./hardcoded.controller");
 
 const staticRequestsRoute = express.Router();
 
