@@ -3,7 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const { httpGeStaticRequest } = require("./staticrequests.controller");
+const { httpGetIndividualRes } = require("./staticrequests.controller");
 
 const staticRequestsRoute = express.Router();
 
@@ -28,6 +28,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-staticRequestsRoute.post("/", upload.single("csvfile"), httpGeStaticRequest);
+staticRequestsRoute.post("/", upload.single("csvfile"), httpGetIndividualRes);
 
 module.exports = staticRequestsRoute;

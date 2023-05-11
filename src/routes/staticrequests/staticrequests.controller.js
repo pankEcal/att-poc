@@ -5,7 +5,7 @@ const { makeHttpReq } = require("../../utils/makeHttpReq");
 /* ============================================ */
 
 // method to make POST request to server and give response back
-async function httpGeStaticRequest(req, res) {
+async function httpGetIndividualRes(req, res) {
 	// record starting time before running test to track the total time taken
 	const startingTime = Date.now();
 
@@ -21,4 +21,4 @@ async function httpGeStaticRequest(req, res) {
 	});
 }
 
-module.exports = { httpGeStaticRequest };
+module.exports = { httpGetIndividualRes };
