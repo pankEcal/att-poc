@@ -21,4 +21,11 @@ async function httpGetIndividualRes(req, res) {
 	});
 }
 
-module.exports = { httpGetIndividualRes };
+async function httpGetApplicationRes(req, res) {
+	return res.status(200).json({
+		success: false,
+		message: "API is working",
+	});
+}
+
+module.exports = { httpGetIndividualRes, httpGetApplicationRes };

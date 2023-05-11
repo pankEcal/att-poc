@@ -3,9 +3,12 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const { httpGetIndividualRes } = require("./hardcoded.controller");
+const {
+	httpGetIndividualRes,
+	httpGetApplicationRes,
+} = require("./hardcoded.controller");
 
-const staticRequestsRoute = express.Router();
+const hardcodedRequestsRoute = express.Router();
 
 const storage = multer.diskStorage({
 	destination: (req, file, callback) => {
@@ -28,6 +31,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-staticRequestsRoute.post("/", upload.single("csvfile"), httpGetIndividualRes);
+hardcodedRequestsRoute.post(
+	"/",
+	upload.single("csvfile"),
+	httpGetIndividualRes
+);
+hardcodedRequestsRoute.post("/application", httpGetApplicationRes); // not handling file uploads
 
-module.exports = staticRequestsRoute;
+module.exports = hardcodedRequestsRoute;
