@@ -5,9 +5,9 @@ const { clearFiles } = require("../utils/clearFiles");
 const { validateServerRes } = require("../utils/validateServerRes");
 
 // method to make POST request to the requested server, and send back the data to main function
-async function makeHttpReq(req) {
+async function makeHttpReq(request) {
 	// check if request body is empty, if it's empty then don't proceed further
-	if (!Object.keys(req.body).length) {
+	if (!Object.keys(request.body).length) {
 		const data = {
 			testResult: { success: false, message: "missing required input data" },
 		};
@@ -17,13 +17,13 @@ async function makeHttpReq(req) {
 	// use try catch block to handle POST request to the provided server
 	try {
 		// if file is uploaded from client side, then it will be handled in this block
-		if (req.file) {
+		if (request.file) {
 			// get required data from request body to make request
 			const {
 				body: { baseUrl, apiLink, ...requestParams },
 				file,
 				headers,
-			} = req;
+			} = request;
 
 			// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
 			if (!baseUrl || !apiLink) {
@@ -64,7 +64,7 @@ async function makeHttpReq(req) {
 			const testResult = {
 				url: baseUrl + apiLink,
 				success: isPassingServerResponse && isPassingValidation ? true : false,
-				method: req.method,
+				method: request.method,
 			};
 
 			// clear the file content after getting server response
@@ -86,7 +86,7 @@ async function makeHttpReq(req) {
 				requestParams,
 				validationParams,
 			},
-		} = req;
+		} = request;
 
 		// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
 		if (!baseUrl || !apiLink) {
@@ -165,7 +165,7 @@ async function makeHttpReq(req) {
 		const testResult = {
 			url: baseUrl + apiLink,
 			success: teststatus,
-			method: req.method,
+			method: request.method,
 		};
 
 		// return testResult, server response data, validation message, and server responded statusCode
