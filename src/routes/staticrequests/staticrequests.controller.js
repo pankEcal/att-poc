@@ -3,62 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const FormData = require("form-data");
 const { clearFiles } = require("../../utils/clearFiles");
-
-// method to reutrn validation message based on the values passed
-function validate(validationParams, serverResponses) {
-	// creating validation message object and a map to store results
-	const validationMessage = {};
-	const resultsMap = new Map();
-	resultsMap.set("passed", 0);
-	resultsMap.set("failed", 0);
-
-	// check if validation params are present or not, if not then it will be handled inside the block, and won't proceed further
-	if (!validationParams || !Object.entries(validationParams).length) {
-		Object.assign(validationMessage, {
-			success: false,
-			validated: false,
-			message: "validation check skipped. No values passed.",
-		});
-
-		return validationMessage;
-	}
-
-	// iterate through each validation param and check if it is present in server response
-	for (key in validationParams) {
-		// if the validation param isn't present in server response then consider it failed case
-		if (String(serverResponses[key]) === "undefined") {
-			resultsMap.set("failed", resultsMap.get("failed") + 1);
-		} else {
-			// defining a validation condition. If value of the validation param and server param are strictly matching then it's validated and is passing case.
-			const isMatchingValidationParam =
-				String(validationParams[key]) === String(serverResponses[key]);
-
-			// update validation result map based on condition
-			isMatchingValidationParam
-				? resultsMap.set("passed", resultsMap.get("passed") + 1)
-				: resultsMap.set("failed", resultsMap.get("failed") + 1);
-		}
-	}
-
-	// check in validation message for the passing case and update the result map accordingly.
-	// passing condition: at least 1 passing case should be there and no failed case should be present.
-	if (resultsMap.get("passed") >= 1 && resultsMap.get("failed") === 0) {
-		Object.assign(validationMessage, {
-			success: true,
-			validated: true,
-			message: "User input and server response is matching",
-		});
-	} else {
-		Object.assign(validationMessage, {
-			success: false,
-			validated: true,
-			message: "User input and server response not matching",
-		});
-	}
-
-	// return the validation based on the conditions checked
-	return validationMessage;
-}
+const { validateServerRes } = require("../../utils/validateServerRes");
 
 // method to make POST request to the requested server, and send back the data to main function
 async function makeHttpReq(req) {
@@ -110,7 +55,7 @@ async function makeHttpReq(req) {
 
 			// get server response after making POST requst to the provided URL
 			const { data, status } = serverResponse;
-			const validationMessage = validate(requestParams, data);
+			const validationMessage = validateServerRes(requestParams, data);
 			// conditions to validate test status
 			const isPassingServerResponse = status === 200 && data.success === true;
 			const isPassingValidation = validationMessage.validated
@@ -208,7 +153,7 @@ async function makeHttpReq(req) {
 		// get server response after making POST requst to the provided URL
 		const { data, status } = serverResponse;
 		// get validation message
-		const validationMessage = validate(validationParams, data);
+		const validationMessage = validateServerRes(validationParams, data);
 
 		// condition to validate test status
 		// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
