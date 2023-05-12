@@ -163,6 +163,29 @@ async function handlePlainReq(request) {
 	};
 }
 
+// hanlde error block
+async function handleError(error) {
+	// if error is occured then pass the message and status codes accordingly
+	const {
+		response: { status } = {}, // if response.status === undefined, in that case assign it as an empty object
+		config: { url } = {}, // if response.config === undefined, in that case assign it as an empty object
+		request: { method } = {}, // if response.request === undefined, in that case assign it as an empty object
+		message,
+	} = error;
+
+	const data = {
+		testResult: {
+			url: url,
+			success: false,
+			method: method,
+			message: message,
+		},
+		serverResponse: error,
+	};
+
+	return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
+}
+
 // main function to handle a HTTP request
 async function makeHttpReq(request) {
 	// validate if request body is empty
@@ -181,25 +204,7 @@ async function makeHttpReq(request) {
 
 		return await handlePlainReq(request);
 	} catch (error) {
-		// if error is occured then pass the message and status codes accordingly
-		const {
-			response: { status } = {}, // if response.status === undefined, in that case assign it as an empty object
-			config: { url } = {}, // if response.config === undefined, in that case assign it as an empty object
-			request: { method } = {}, // if response.request === undefined, in that case assign it as an empty object
-			message,
-		} = error;
-
-		const data = {
-			testResult: {
-				url: url,
-				success: false,
-				method: method,
-				message: message,
-			},
-			serverResponse: error,
-		};
-
-		return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
+		return await handleError(request);
 	}
 }
 
