@@ -20,6 +20,7 @@ function handleError(error) {
 			success: false,
 			method: method,
 			message: message ? message : null,
+			status,
 		},
 		error,
 	};
@@ -68,6 +69,7 @@ async function handleFileUploadReq(request) {
 			url: baseUrl + apiLink,
 			success: teststatus,
 			method: request.method,
+			status: status ?? 400,
 			message: validationMessage.validated
 				? validationMessage.message
 				: data.successMessage,
@@ -106,6 +108,7 @@ async function handlePlainReq(request) {
 				testResult: {
 					success: false,
 					message: "request method not provided",
+					status: 400,
 				},
 			};
 
@@ -120,6 +123,7 @@ async function handlePlainReq(request) {
 			const data = {
 				testResult: {
 					success: false,
+					status: 400,
 					message: "invalid request method",
 				},
 			};
@@ -165,6 +169,7 @@ async function handlePlainReq(request) {
 			url: baseUrl + apiLink,
 			success: teststatus,
 			method: request.method,
+			status: status ?? 400,
 			message: validationMessage.validated
 				? validationMessage.message
 				: data.successMessage || data.errorMessage,
@@ -207,7 +212,7 @@ async function handleBatchApplicationReq(request) {
 			},
 		};
 
-		const { data, status } = await handlePlainReq(request);
+		const { data } = await handlePlainReq(request);
 		Object.assign(data.testResult, { apiName });
 
 		// updating response object to add time taken to execute tests
@@ -273,7 +278,11 @@ async function makeHttpReq(request) {
 	// validate if request body. If it's empty then throw relevant response and don't proceed for any requests
 	if (!Object.keys(request.body).length) {
 		const data = {
-			testResult: { success: false, message: "missing required request data" },
+			testResult: {
+				success: false,
+				message: "missing required request data",
+				status: 400,
+			},
 		};
 		return { data, status: 400 };
 	}
@@ -283,6 +292,7 @@ async function makeHttpReq(request) {
 		const data = {
 			testResult: {
 				success: false,
+				status: 400,
 				message: "invalid or incomplete URL input",
 			},
 		};
