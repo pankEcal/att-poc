@@ -68,6 +68,9 @@ async function handleFileUploadReq(request) {
 			url: baseUrl + apiLink,
 			success: teststatus,
 			method: request.method,
+			message: validationMessage.validated
+				? validationMessage.message
+				: data.successMessage,
 		};
 
 		// clear the file content after getting server response
@@ -162,11 +165,14 @@ async function handlePlainReq(request) {
 			url: baseUrl + apiLink,
 			success: teststatus,
 			method: request.method,
+			message: validationMessage.validated
+				? validationMessage.message
+				: data.successMessage || data.errorMessage,
 		};
 
 		// return response back to the calling method
 		return {
-			data: { testResult, serverResponse: { data }, validationMessage },
+			data: { testResult, serverResponse: { ...data }, validationMessage },
 			status: status ?? 400,
 		};
 	} catch (error) {
