@@ -39,18 +39,18 @@ async function handleFileUploadReq(request) {
 	const { data, status } = serverResponse;
 	const validationMessage = validateServerRes(requestParams, data);
 
-	// conditions to validate test status
-	// if server gives statusCode 200 and also success true then it's passing case
+	// condition to validate test status
+	// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
+	// if validation param isn't passed then test result will be thrown based on server response.
 	const isPassingServerResponse = status === 200 && data.success === true;
-	// if validation is skipped then validation result doesn't matter, else pass the vlidation test status
-	const isPassingValidation = validationMessage.validated
+	const teststatus = validationMessage.validated
 		? validationMessage.success
-		: true;
+		: isPassingServerResponse;
 
 	// populate final test result
 	const testResult = {
 		url: baseUrl + apiLink,
-		success: isPassingServerResponse && isPassingValidation ? true : false,
+		success: teststatus,
 		method: request.method,
 	};
 
@@ -142,17 +142,17 @@ async function handlePlainReq(request) {
 	// perform validation and get validation message
 	const validationMessage = validateServerRes(validationParams, data);
 
-	// conditions to validate test status
-	// if server gives statusCode 200 and also success true then it's passing case
+	// condition to validate test status
+	// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
+	// if validation param isn't passed then test result will be thrown based on server response.
 	const isPassingServerResponse = status === 200 && data.success === true;
-	// if validation is skipped then validation result doesn't matter, else pass the vlidation test status
-	const isPassingValidation = validationMessage.validated
+	const teststatus = validationMessage.validated
 		? validationMessage.success
-		: true;
+		: isPassingServerResponse;
 
 	const testResult = {
 		url: baseUrl + apiLink,
-		success: isPassingServerResponse && isPassingValidation ? true : false,
+		success: teststatus,
 		method: request.method,
 	};
 
