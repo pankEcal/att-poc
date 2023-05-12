@@ -4,9 +4,68 @@ const FormData = require("form-data");
 const { clearFiles } = require("../utils/clearFiles");
 const { validateServerRes } = require("../utils/validateServerRes");
 
-// method to make POST request to the requested server, and send back the data to main function
+async function handleFileUploadReq(request) {
+	const {
+		body: { baseUrl, apiLink, ...requestParams },
+		file,
+		headers,
+	} = request;
+
+	// validate baseUrl and apiLink. If any of is not present then throw relevant response and don't proceed for any requests
+	if (!baseUrl || !apiLink) {
+		return {
+			success: false,
+			message: "URL input invalid or incomplete",
+		};
+	}
+
+	// create a new formData object instance to handle file uploading
+	let formDataInput = new FormData();
+	// append the uploaded file and body params into the created formData
+	formDataInput.append("csvfile", fs.createReadStream(file.path));
+	for (key in requestParams) {
+		formDataInput.append(key, requestParams[key]);
+	}
+
+	// if  baseUrl and apiLink fields are non-empty then make POST request with the created formData
+	const serverResponse = await axios.post(baseUrl + apiLink, formDataInput, {
+		headers: {
+			authorization: headers.authorization ? headers.authorization : null,
+		},
+	});
+
+	// get server response after making POST requst to the provided URL
+	const { data, status } = serverResponse;
+	const validationMessage = validateServerRes(requestParams, data);
+
+	// conditions to validate test status
+	// if server gives statusCode 200 and also success true then it's passing case
+	const isPassingServerResponse = status === 200 && data.success === true;
+	// if validation is skipped then validation result doesn't matter, else pass the vlidation test status
+	const isPassingValidation = validationMessage.validated
+		? validationMessage.success
+		: true;
+
+	// populate final test result
+	const testResult = {
+		url: baseUrl + apiLink,
+		success: isPassingServerResponse && isPassingValidation ? true : false,
+		method: request.method,
+	};
+
+	// clear the file content after getting server response
+	clearFiles();
+
+	// return response back to the calling method
+	return {
+		data: { testResult, serverResponse: data, validationMessage },
+		status,
+	};
+}
+
+// method to handle requests to the requested server, and send back the response data
 async function makeHttpReq(request) {
-	// check if request body is empty, if it's empty then don't proceed further
+	// validate if request body is empty
 	if (!Object.keys(request.body).length) {
 		const data = {
 			testResult: { success: false, message: "missing required input data" },
@@ -16,65 +75,9 @@ async function makeHttpReq(request) {
 
 	// use try catch block to handle POST request to the provided server
 	try {
-		// if file is uploaded from client side, then it will be handled in this block
+		// handle file upload requests
 		if (request.file) {
-			// get required data from request body to make request
-			const {
-				body: { baseUrl, apiLink, ...requestParams },
-				file,
-				headers,
-			} = request;
-
-			// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
-			if (!baseUrl || !apiLink) {
-				return {
-					success: false,
-					message: "URL input invalid or incomplete",
-				};
-			}
-
-			// create a new formData object instance to handle file uploading
-			let formDataInput = new FormData();
-			// append the uploaded file and body params into the created formData
-			formDataInput.append("csvfile", fs.createReadStream(file.path));
-			for (key in requestParams) {
-				formDataInput.append(key, requestParams[key]);
-			}
-
-			// if  baseUrl and apiLink fields are non-empty then make POST request with the created formData
-			const serverResponse = await axios.post(
-				baseUrl + apiLink,
-				formDataInput,
-				{
-					headers: {
-						authorization: headers.authorization ? headers.authorization : null,
-					},
-				}
-			);
-
-			// get server response after making POST requst to the provided URL
-			const { data, status } = serverResponse;
-			const validationMessage = validateServerRes(requestParams, data);
-			// conditions to validate test status
-			const isPassingServerResponse = status === 200 && data.success === true;
-			const isPassingValidation = validationMessage.validated
-				? validationMessage.success
-				: true;
-
-			const testResult = {
-				url: baseUrl + apiLink,
-				success: isPassingServerResponse && isPassingValidation ? true : false,
-				method: request.method,
-			};
-
-			// clear the file content after getting server response
-			clearFiles();
-
-			// return testResult, server response data, validation message, and server responded statusCode
-			return {
-				data: { testResult, serverResponse: data, validationMessage },
-				status,
-			};
+			return await handleFileUploadReq(request);
 		}
 
 		// get required data from request body to make request
@@ -191,6 +194,7 @@ async function makeHttpReq(request) {
 			},
 			serverResponse: error,
 		};
+
 		return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
 	}
 }
