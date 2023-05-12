@@ -376,19 +376,21 @@ NOTE: The fields are expected to be passed as form data.
 1. `baseUrl`: (mandatory) is base url of the API being tested.
 2. `apiLink`: (mandatory) is the rest part of the API being tested.
 3. `csvfile`: (mandatory) is the csv file being uploaded on the API.
+4. `headers`: is authorization header which could be required. Should be directly passed as a request header instead of sending in request body.
 
 NOTE: Fields other than mandatory fields are considered as validation fields. The test result will be determined based on that.
 
 > If any header is required to be passed then it has to be passed as standard request header while sending the request.
 
-**Expected fields for tests related to file uploading:**
+**Expected fields for tests not related to file uploading:**
 
 NOTE: The fields are expected to be passed in JSON format
 
 1. `baseUrl`: (mandatory) is base url of the API being tested.
 2. `apiLink`: (mandatory) is the rest part of the API being tested.
-3. `requestParams`: is the field which consists all the required parameters to make valid request to the API.
-4. `validationParams`: is the field which consists all the required parameters to validate the server response received from server side of the tested API. If the field is missing or empty, then validation check will be skipped.
+3. `requestMethod`: (mandatory) is the type of the test to be done. Anything except of "GET" or "POST" will be considerd invalid request method.
+4. `requestParams`: is the field which consists all the required parameters to make valid request to the API.
+5. `validationParams`: is the field which consists all the required parameters to validate the server response received from server side of the tested API. If the field is missing or empty, then validation check will be skipped.
 
 **Understanding JSON response**
 
