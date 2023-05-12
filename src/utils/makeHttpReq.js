@@ -180,6 +180,72 @@ async function handlePlainReq(request) {
 	}
 }
 
+// handle application level requests
+async function handleBatchApplicationReq(request) {
+	const {
+		body: { applicationName, baseUrl, links },
+	} = request;
+
+	const responseData = [];
+
+	for (let i = 0; i < links.length; i++) {
+		const { apiLink, requestMethod, requestParams, validationParams } =
+			links[i];
+		const request = {
+			body: {
+				baseUrl,
+				apiLink,
+				requestMethod,
+				requestParams,
+				validationParams,
+			},
+		};
+
+		const { data, status } = await handlePlainReq(request);
+		Object.assign(data.testResult, { apiName: links[i].apiName });
+		responseData.push(data);
+	}
+
+	return { data: responseData };
+}
+
+const getApplicationData = () => {
+	return (data = {
+		applicationName: "Bike Intell",
+		baseUrl: "https://evaai.enginecal.com/",
+		links: [
+			{
+				apiName: "User Login Check",
+				apiLink: "core/v1/bike-intell/checklogins",
+				requestMethod: "POST",
+				requestParams: {
+					u: "saurabh.singh@enginecal.com",
+					p: "123456",
+				},
+				validationParams: {
+					userType: "Bluetooth User",
+				},
+			},
+			{
+				apiName: "forgot password",
+				apiLink: "core/v1/bike-intell/forgetpass",
+				requestMethod: "POST",
+				requestParams: {
+					u: "saurabh.singh@enginecal.com",
+					p: "123456",
+				},
+				validationParams: {
+					userType: "Bluetooth User",
+				},
+			},
+		],
+	});
+};
+
+/* ================================================== */
+/* ========  main methods to hanlde requests ======== */
+/* ================================================== */
+
 // main function to handle a HTTP request
 async function makeHttpReq(request) {
 	const {
@@ -218,4 +284,14 @@ async function makeHttpReq(request) {
 	return await handlePlainReq(request);
 }
 
-module.exports = { makeHttpReq };
+async function makeBatchAppHttpReq(request) {
+	// const data = getApplicationData();
+	const data = await handleBatchApplicationReq(request);
+
+	return {
+		...data,
+		status: 200,
+	};
+}
+
+module.exports = { makeHttpReq, makeBatchAppHttpReq };
