@@ -6,10 +6,12 @@ async function clearFiles() {
 	const basePath = path.join(__dirname, "../../public/uploads/");
 	const uploadedFiles = [];
 
+	// get the list of files present inside of the basePath
 	fs.readdirSync(basePath).map((filename) => {
 		uploadedFiles.push(basePath + filename);
 	});
 
+	// re-write the contents of the files to empty content
 	fs.access(basePath, (error) => {
 		if (!error) {
 			uploadedFiles.map((file) => {

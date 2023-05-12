@@ -8,13 +8,14 @@ const {
 	httpGetApplicationRes,
 } = require("./hardcoded.controller");
 
-const hardcodedRequestsRoute = express.Router();
+const hardcodedRequestsRoute = express.Router(); // create a express router
 
+// handling file upload parameters
 const storage = multer.diskStorage({
 	destination: (req, file, callback) => {
 		const fileUploadPath = path.join(__dirname, "../../../", "public/uploads");
 
-		// if the directory doesn't exist then create it
+		// if file upload path doesn't exist then create it
 		if (!fs.existsSync(fileUploadPath)) {
 			fs.mkdirSync(fileUploadPath, { recursive: true }, (error) => {
 				if (error) console.log(error);
@@ -23,6 +24,8 @@ const storage = multer.diskStorage({
 
 		callback(null, fileUploadPath);
 	},
+
+	// updating the file name to uploadedFile.<format>
 	filename: (req, file, callback) => {
 		const fileExtension = file.originalname.split(".")[1];
 		callback(null, `uploadedFile.${fileExtension}`);
@@ -31,11 +34,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// handle individual URL requests
 hardcodedRequestsRoute.post(
 	"/",
-	upload.single("csvfile"),
+	upload.single("csvfile"), // in req.file it will have key "csvfile" which points to the uploaded file
 	httpGetIndividualRes
 );
-hardcodedRequestsRoute.post("/application", httpGetApplicationRes); // not handling file uploads
+
+// making batch request based on application requests, not handling file uploads
+hardcodedRequestsRoute.post("/application", httpGetApplicationRes);
 
 module.exports = hardcodedRequestsRoute;

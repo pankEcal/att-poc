@@ -6,16 +6,18 @@ const fileUploadRouter = require("./routes/fileupload/fileUpload.router");
 const dailyMoniterRouter = require("./routes/dailymonitor/dailymonitor.router");
 const hardcodedRequestsRoute = require("./routes/hardcoded/hardcoded.router");
 
+// defining CORS parameters
 let corsOptions = {
 	origin: "*",
 };
 
 const app = express();
 
+// implementing middlewares
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
-/* Implementing routes */
+/* Implementing dedicated routes */
 app.use("/fileupload", fileUploadRouter);
 app.use("/dailymonitor", dailyMoniterRouter);
 app.use("/hardcoded", hardcodedRequestsRoute);
