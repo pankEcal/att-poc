@@ -182,6 +182,9 @@ async function handlePlainReq(request) {
 
 // handle application level requests
 async function handleBatchApplicationReq(request) {
+	// record starting time before running test to track the total time taken
+	const batchStartingTime = Date.now();
+
 	const {
 		body: { applicationName, baseUrl, links },
 	} = request;
@@ -189,7 +192,10 @@ async function handleBatchApplicationReq(request) {
 	const responseData = [];
 
 	for (let i = 0; i < links.length; i++) {
-		const { apiLink, requestMethod, requestParams, validationParams } =
+		// record starting time before running test to track the total time taken
+		const individualStartingTime = Date.now();
+
+		const { apiLink, requestMethod, requestParams, validationParams, apiName } =
 			links[i];
 		const request = {
 			body: {
@@ -202,11 +208,23 @@ async function handleBatchApplicationReq(request) {
 		};
 
 		const { data, status } = await handlePlainReq(request);
-		Object.assign(data.testResult, { apiName: links[i].apiName });
+		Object.assign(data.testResult, { apiName });
+
+		// updating response object to add time taken to execute tests
+		Object.assign(data.testResult, {
+			testDuration: `${Date.now() - individualStartingTime} ms`,
+		});
+
 		responseData.push(data);
 	}
 
-	return { data: responseData };
+	return {
+		data: {
+			applicationName,
+			testDuration: `${Date.now() - batchStartingTime} ms`,
+			responseData,
+		},
+	};
 }
 
 const getApplicationData = () => {
@@ -286,10 +304,10 @@ async function makeHttpReq(request) {
 
 async function makeBatchAppHttpReq(request) {
 	// const data = getApplicationData();
-	const data = await handleBatchApplicationReq(request);
+	const { data } = await handleBatchApplicationReq(request);
 
 	return {
-		...data,
+		data,
 		status: 200,
 	};
 }
