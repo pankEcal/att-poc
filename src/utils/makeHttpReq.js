@@ -4,6 +4,7 @@ const FormData = require("form-data");
 const { clearFiles } = require("../utils/clearFiles");
 const { validateServerRes } = require("../utils/validateServerRes");
 
+// handle file upload requests
 async function handleFileUploadReq(request) {
 	const {
 		body: { baseUrl, apiLink, ...requestParams },
@@ -63,7 +64,106 @@ async function handleFileUploadReq(request) {
 	};
 }
 
-// method to handle requests to the requested server, and send back the response data
+// handle normal requests (without file uploads)
+async function handlePlainReq(request) {
+	// get required data from request body to make request
+	const {
+		body: {
+			baseUrl,
+			apiLink,
+			requestMethod = undefined,
+			requestParams,
+			validationParams,
+		},
+	} = request;
+
+	// validate baseUrl and apiLinks
+	if (!baseUrl || !apiLink) {
+		const data = {
+			testResult: {
+				success: false,
+				message: "invalid or incomplete URL input",
+			},
+		};
+
+		return {
+			data,
+			status: 400,
+		};
+	}
+
+	// validate request method
+	if (!Boolean(requestMethod)) {
+		const data = {
+			testResult: {
+				success: false,
+				message: "request method not provided",
+			},
+		};
+
+		return {
+			data,
+			status: 400,
+		};
+	} else if (
+		String(requestMethod).toUpperCase() !== "GET" &&
+		String(requestMethod).toUpperCase() !== "POST"
+	) {
+		const data = {
+			testResult: {
+				success: false,
+				message: "invalid request method",
+			},
+		};
+
+		return {
+			data,
+			status: 400,
+		};
+	}
+
+	let serverResponse = {};
+
+	// handle request methods and populate data to serverResponse
+	if (requestMethod === "GET") {
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
+		const response = await axios.get(baseUrl + apiLink); // make HTTP request and get response back
+		Object.assign(serverResponse, response); // update responsedata to be sent after making request
+	} else if (requestMethod === "POST") {
+		// make HTTP request and get response back
+		response = await axios.post(baseUrl + apiLink, requestParams, {
+			headers: { "Content-Type": "application/json" },
+		});
+		Object.assign(serverResponse, response); // update responsedata to be sent after making request
+	}
+
+	// get server response after making HTTP requst to the provided URL
+	const { data, status } = serverResponse;
+	// perform validation and get validation message
+	const validationMessage = validateServerRes(validationParams, data);
+
+	// conditions to validate test status
+	// if server gives statusCode 200 and also success true then it's passing case
+	const isPassingServerResponse = status === 200 && data.success === true;
+	// if validation is skipped then validation result doesn't matter, else pass the vlidation test status
+	const isPassingValidation = validationMessage.validated
+		? validationMessage.success
+		: true;
+
+	const testResult = {
+		url: baseUrl + apiLink,
+		success: isPassingServerResponse && isPassingValidation ? true : false,
+		method: request.method,
+	};
+
+	// return response back to the calling method
+	return {
+		data: { testResult, serverResponse: data, validationMessage },
+		status,
+	};
+}
+
+// main function to handle a HTTP request
 async function makeHttpReq(request) {
 	// validate if request body is empty
 	if (!Object.keys(request.body).length) {
@@ -75,107 +175,11 @@ async function makeHttpReq(request) {
 
 	// use try catch block to handle POST request to the provided server
 	try {
-		// handle file upload requests
 		if (request.file) {
 			return await handleFileUploadReq(request);
 		}
 
-		// get required data from request body to make request
-		const {
-			body: {
-				baseUrl,
-				apiLink,
-				requestMethod = undefined,
-				requestParams,
-				validationParams,
-			},
-		} = request;
-
-		// check if baseUrl and apiLink fields are empty, In that case, it will be handled inside this block and won't proceed further
-		if (!baseUrl || !apiLink) {
-			const data = {
-				testResult: {
-					success: false,
-					message: "invalid or incomplete URL input",
-				},
-			};
-
-			return {
-				data,
-				status: 400,
-			};
-		}
-
-		if (!Boolean(requestMethod)) {
-			const data = {
-				testResult: {
-					success: false,
-					message: "request method not provided",
-				},
-			};
-
-			return {
-				data,
-				status: 400,
-			};
-		} else if (
-			String(requestMethod).toUpperCase() !== "GET" &&
-			String(requestMethod).toUpperCase() !== "POST"
-		) {
-			const data = {
-				testResult: {
-					success: false,
-					message: "invalid request method",
-				},
-			};
-
-			return {
-				data,
-				status: 400,
-			};
-		}
-
-		let serverResponse = {};
-
-		// handle request methods and populate data to serverResponse
-		if (requestMethod === "GET") {
-			// if  baseUrl and apiLink fields are non-empty then make POST request with the provided request body
-			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
-			const response = await axios.get(baseUrl + apiLink);
-			Object.assign(serverResponse, response);
-		} else if (requestMethod === "POST") {
-			// handle POST method. If it's not GET then it's POST only as validation is already done
-			// if  baseUrl and apiLink fields are non-empty then make POST request with the provided request body
-			response = await axios.post(baseUrl + apiLink, requestParams, {
-				headers: { "Content-Type": "application/json" },
-			});
-			Object.assign(serverResponse, response);
-		}
-
-		// get server response after making POST requst to the provided URL
-		const { data, status } = serverResponse;
-		// get validation message
-		const validationMessage = validateServerRes(validationParams, data);
-
-		// condition to validate test status
-		// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
-		// if validation param isn't passed then test result will be thrown based on server response.
-		const isPassingServerResponse = status === 200 && data.success === true;
-		const teststatus = validationMessage.validated
-			? validationMessage.success
-			: isPassingServerResponse;
-
-		const testResult = {
-			url: baseUrl + apiLink,
-			success: teststatus,
-			method: request.method,
-		};
-
-		// return testResult, server response data, validation message, and server responded statusCode
-		return {
-			data: { testResult, serverResponse: data, validationMessage },
-			status,
-		};
+		return await handlePlainReq(request);
 	} catch (error) {
 		// if error is occured then pass the message and status codes accordingly
 		const {
