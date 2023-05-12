@@ -30,6 +30,38 @@ function handleError(error) {
 
 // handle file upload requests
 async function handleFileUploadReq(request) {
+	const {
+		body: { baseUrl, apiLink },
+	} = request;
+
+	// validate if request body. If it's empty then throw relevant response and don't proceed for any requests
+	if (!Object.keys(request.body).length) {
+		const data = {
+			testResult: {
+				success: false,
+				message: "missing required request data",
+				status: 400,
+			},
+		};
+		return { data, status: 400 };
+	}
+
+	// validate baseUrl and apiLink. If any of is not present then throw relevant response and don't proceed for any requests
+	if (!baseUrl || !apiLink) {
+		const data = {
+			testResult: {
+				success: false,
+				status: 400,
+				message: "invalid or incomplete URL input",
+			},
+		};
+
+		return {
+			data,
+			status: 400,
+		};
+	}
+
 	try {
 		const {
 			body: { baseUrl, apiLink, ...requestParams },
