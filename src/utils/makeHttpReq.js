@@ -36,14 +36,6 @@ async function handleFileUploadReq(request) {
 			headers,
 		} = request;
 
-		// validate baseUrl and apiLink. If any of is not present then throw relevant response and don't proceed for any requests
-		if (!baseUrl || !apiLink) {
-			return {
-				success: false,
-				message: "URL input invalid or incomplete",
-			};
-		}
-
 		// create a new formData object instance to handle file uploading
 		let formDataInput = new FormData();
 		// append the uploaded file and body params into the created formData
@@ -104,21 +96,6 @@ async function handlePlainReq(request) {
 				validationParams,
 			},
 		} = request;
-
-		// validate baseUrl and apiLinks
-		if (!baseUrl || !apiLink) {
-			const data = {
-				testResult: {
-					success: false,
-					message: "invalid or incomplete URL input",
-				},
-			};
-
-			return {
-				data,
-				status: 400,
-			};
-		}
 
 		// validate request method
 		if (!Boolean(requestMethod)) {
@@ -196,12 +173,31 @@ async function handlePlainReq(request) {
 
 // main function to handle a HTTP request
 async function makeHttpReq(request) {
-	// validate if request body is empty
+	const {
+		body: { baseUrl, apiLink },
+	} = request;
+
+	// validate if request body. If it's empty then throw relevant response and don't proceed for any requests
 	if (!Object.keys(request.body).length) {
 		const data = {
-			testResult: { success: false, message: "missing required input data" },
+			testResult: { success: false, message: "missing required request data" },
 		};
 		return { data, status: 400 };
+	}
+
+	// validate baseUrl and apiLink. If any of is not present then throw relevant response and don't proceed for any requests
+	if (!baseUrl || !apiLink) {
+		const data = {
+			testResult: {
+				success: false,
+				message: "invalid or incomplete URL input",
+			},
+		};
+
+		return {
+			data,
+			status: 400,
+		};
 	}
 
 	// handle file uploading request
