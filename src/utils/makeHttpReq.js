@@ -256,17 +256,47 @@ async function handleBatchApplicationReq(request) {
 	const batchStartingTime = Date.now();
 
 	const {
-		body: { applicationName, baseUrl, links },
+		body: { applicationName, baseUrl, apis },
 	} = request;
 
-	const responseData = [];
+	if (!baseUrl) {
+		const data = {
+			testResult: {
+				success: false,
+				status: 400,
+				message: "missing baseUrl in request body",
+			},
+		};
 
-	for (let i = 0; i < links.length; i++) {
+		return {
+			data,
+			status: 400,
+		};
+	}
+
+	if (!apis) {
+		const data = {
+			testResult: {
+				success: false,
+				status: 400,
+				message: "missing apis data in request body",
+			},
+		};
+
+		return {
+			data,
+			status: 400,
+		};
+	}
+
+	const responseData = [];
+	for (let i = 0; i < apis.length; i++) {
 		// record starting time before running test to track the total time taken
 		const individualStartingTime = Date.now();
 
 		const { apiLink, requestMethod, requestParams, validationParams, apiName } =
-			links[i];
+			apis[i];
+
 		const request = {
 			body: {
 				baseUrl,
@@ -278,7 +308,7 @@ async function handleBatchApplicationReq(request) {
 		};
 
 		const { data } = await handlePlainReq(request);
-		Object.assign(data.testResult, { apiName });
+		Object.assign(data.testResult, { apiName: apiName ?? null });
 
 		// updating response object to add time taken to execute tests
 		Object.assign(data.testResult, {
@@ -301,7 +331,7 @@ const getApplicationData = () => {
 	return (data = {
 		applicationName: "Bike Intell",
 		baseUrl: "https://evaai.enginecal.com/",
-		links: [
+		apis: [
 			{
 				apiName: "User Login Check",
 				apiLink: "core/v1/bike-intell/checklogins",
