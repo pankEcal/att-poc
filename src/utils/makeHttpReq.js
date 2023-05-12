@@ -21,7 +21,7 @@ function handleError(error) {
 			method: method,
 			message: message ? message : null,
 		},
-		serverResponse: error,
+		error,
 	};
 
 	return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
