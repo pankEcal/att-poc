@@ -21,7 +21,7 @@ function handleError(error) {
 			method: method,
 			message: message ? message : null,
 		},
-		errorResponse: error,
+		serverResponse: error,
 	};
 
 	return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
@@ -128,6 +128,7 @@ async function handlePlainReq(request) {
 		}
 
 		let serverResponse = {};
+		let validationMessage = {};
 
 		// handle request methods and populate data to serverResponse
 		if (requestMethod === "GET") {
@@ -144,8 +145,10 @@ async function handlePlainReq(request) {
 
 		// get server response after making HTTP requst to the provided URL
 		const { data, status } = serverResponse;
-		// perform validation and get validation message
-		const validationMessage = validateServerRes(validationParams, data);
+		// perform validation and get validation message if server responded with data
+		if (data) {
+			validationMessage = validateServerRes(validationParams, data);
+		}
 
 		// condition to validate test status
 		// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
@@ -163,8 +166,8 @@ async function handlePlainReq(request) {
 
 		// return response back to the calling method
 		return {
-			data: { testResult, serverResponse: data, validationMessage },
-			status,
+			data: { testResult, serverResponse: { data }, validationMessage },
+			status: status ?? 400,
 		};
 	} catch (error) {
 		return handleError(error);
