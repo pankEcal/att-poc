@@ -64,10 +64,37 @@ async function handleFileUploadReq(request) {
 
 	try {
 		const {
-			body: { baseUrl, apiLink, ...requestParams },
+			body: { baseUrl, apiLink, requestMethod, ...requestParams },
 			file,
 			headers,
 		} = request;
+
+		// validate request method
+		if (!Boolean(requestMethod)) {
+			const data = {
+				testResult: {
+					success: false,
+					message: "request method not provided",
+					status: 400,
+				},
+			};
+			return {
+				data,
+				status: 400,
+			};
+		} else if (String(requestMethod).toUpperCase() !== "POST") {
+			const data = {
+				testResult: {
+					success: false,
+					message: "invalid request method. Only POST request is accepted.",
+					status: 400,
+				},
+			};
+			return {
+				data,
+				status: 400,
+			};
+		}
 
 		let serverResponse = {};
 		let validationMessage = {};
@@ -194,7 +221,8 @@ async function handlePlainReq(request) {
 				testResult: {
 					success: false,
 					status: 400,
-					message: "invalid request method",
+					message:
+						"invalid request method. Only GET and POST requests are accepted.",
 				},
 			};
 
