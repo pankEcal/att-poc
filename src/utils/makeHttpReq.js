@@ -39,7 +39,7 @@ async function handleFileUploadReq(request) {
 		const data = {
 			testResult: {
 				success: false,
-				message: "missing required request data",
+				message: "Missing required request data",
 				status: 400,
 			},
 		};
@@ -52,7 +52,7 @@ async function handleFileUploadReq(request) {
 			testResult: {
 				success: false,
 				status: 400,
-				message: "invalid or incomplete URL input",
+				message: "Invalid or incomplete URL input",
 			},
 		};
 
@@ -74,7 +74,7 @@ async function handleFileUploadReq(request) {
 			const data = {
 				testResult: {
 					success: false,
-					message: "request method not provided",
+					message: "Request method not provided",
 					status: 400,
 				},
 			};
@@ -86,7 +86,7 @@ async function handleFileUploadReq(request) {
 			const data = {
 				testResult: {
 					success: false,
-					message: "invalid request method. Only POST request is accepted.",
+					message: "Invalid request method. Only POST request is accepted",
 					status: 400,
 				},
 			};
@@ -164,7 +164,7 @@ async function handlePlainReq(request) {
 		const data = {
 			testResult: {
 				success: false,
-				message: "missing required request data",
+				message: "Missing required request data",
 				status: 400,
 			},
 		};
@@ -177,7 +177,7 @@ async function handlePlainReq(request) {
 			testResult: {
 				success: false,
 				status: 400,
-				message: "invalid or incomplete URL input",
+				message: "Invalid or incomplete URL input",
 			},
 		};
 
@@ -204,7 +204,7 @@ async function handlePlainReq(request) {
 			const data = {
 				testResult: {
 					success: false,
-					message: "request method not provided",
+					message: "Request method not provided",
 					status: 400,
 				},
 			};
@@ -222,7 +222,7 @@ async function handlePlainReq(request) {
 					success: false,
 					status: 400,
 					message:
-						"invalid request method. Only GET and POST requests are accepted.",
+						"Invalid request method. Only GET and POST requests are accepted.",
 				},
 			};
 
@@ -298,7 +298,7 @@ async function handleBatchApplicationReq(request) {
 			testResult: {
 				success: false,
 				status: 400,
-				message: "missing baseUrl in request body",
+				message: "Missing baseUrl in request body",
 			},
 		};
 
@@ -313,7 +313,7 @@ async function handleBatchApplicationReq(request) {
 			testResult: {
 				success: false,
 				status: 400,
-				message: "missing apis data in request body",
+				message: "Missing apis data in request body",
 			},
 		};
 
