@@ -293,12 +293,39 @@ async function handleBatchApplicationReq(request) {
 		body: { applicationName, baseUrl, apis },
 	} = request;
 
+	// validate if request body. If it's empty then throw relevant response and don't proceed for any requests
+	if (!Object.keys(request.body).length) {
+		const data = {
+			testResult: {
+				success: false,
+				message: "Missing required request data",
+				status: 400,
+			},
+		};
+		return { data, status: 400 };
+	}
+
 	if (!baseUrl) {
 		const data = {
 			testResult: {
 				success: false,
 				status: 400,
 				message: "Missing baseUrl in request body",
+			},
+		};
+
+		return {
+			data,
+			status: 400,
+		};
+	}
+
+	if (!applicationName) {
+		const data = {
+			testResult: {
+				success: false,
+				status: 400,
+				message: "Missing application name in request body",
 			},
 		};
 
