@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const { trim_body } = require("request_trimmer");
 
 const fileUploadRouter = require("./routes/fileupload/fileUpload.router");
 const dailyMoniterRouter = require("./routes/dailymonitor/dailymonitor.router");
@@ -16,6 +17,7 @@ const app = express();
 // implementing middlewares
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
+app.use(trim_body);
 
 /* Implementing dedicated routes */
 app.use("/fileupload", fileUploadRouter);
