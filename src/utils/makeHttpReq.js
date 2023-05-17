@@ -69,6 +69,9 @@ async function handleFileUploadReq(request) {
 			headers,
 		} = request;
 
+		let serverResponse = {};
+		let validationMessage = {};
+
 		// create a new formData object instance to handle file uploading
 		let formDataInput = new FormData();
 		// append the uploaded file and body params into the created formData
@@ -78,15 +81,18 @@ async function handleFileUploadReq(request) {
 		}
 
 		// if  baseUrl and apiLink fields are non-empty then make POST request with the created formData
-		const serverResponse = await axios.post(baseUrl + apiLink, formDataInput, {
+		serverResponse = await axios.post(baseUrl + apiLink, formDataInput, {
 			headers: {
 				authorization: headers.authorization ? headers.authorization : null,
 			},
 		});
 
-		// get server response after making POST requst to the provided URL
+		// get server response after making HTTP requst to the provided URL
 		const { data, status } = serverResponse;
-		const validationMessage = validateServerRes(requestParams, data);
+		// perform validation and get validation message if server responded with data
+		if (data) {
+			validationMessage = validateServerRes(requestParams, data);
+		}
 
 		// condition to validate test status
 		// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
