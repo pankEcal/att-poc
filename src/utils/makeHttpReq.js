@@ -323,7 +323,7 @@ async function handleBatchApplicationReq(request) {
 		};
 	}
 
-	const responseData = [];
+	const testData = [];
 	for (let i = 0; i < apis.length; i++) {
 		// record starting time before running test to track the total time taken
 		const individualStartingTime = Date.now();
@@ -349,14 +349,15 @@ async function handleBatchApplicationReq(request) {
 			testDuration: `${Date.now() - individualStartingTime} ms`,
 		});
 
-		responseData.push(data);
+		testData.push(data);
 	}
 
 	return {
 		data: {
 			applicationName,
 			testDuration: `${Date.now() - batchStartingTime} ms`,
-			responseData,
+			apisTested: testData.length,
+			testData,
 		},
 	};
 }
