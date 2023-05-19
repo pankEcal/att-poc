@@ -22,10 +22,10 @@ function isValidReqData(request) {
 // read csv file and return device ID
 async function getDeviceId() {
 	return new Promise((resolve, reject) => {
-		const csvFilePath = path.join(
+		const uploadedFilePath = path.join(
 			__dirname,
 			"../../../public/uploads",
-			"csvfile.csv"
+			"uploadedFile.csv"
 		);
 		const deviceIdFilePath = path.join(
 			__dirname,
@@ -35,7 +35,7 @@ async function getDeviceId() {
 
 		const writeStream = fs.createWriteStream(deviceIdFilePath);
 
-		fs.createReadStream(csvFilePath)
+		fs.createReadStream(uploadedFilePath)
 			.pipe(parse({ delimiter: ",", from_line: 2, toLine: 2 }))
 			.on("data", function (row) {
 				writeStream.write(row[0], "utf8");

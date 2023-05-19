@@ -23,7 +23,8 @@ const storage = multer.diskStorage({
 		callback(null, fileUploadPath);
 	},
 	filename: (req, file, callback) => {
-		callback(null, "csvfile.csv");
+		const fileExtension = file.originalname.split(".")[1];
+		callback(null, `uploadedFile.${fileExtension}`);
 	},
 });
 
