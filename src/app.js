@@ -8,10 +8,7 @@ const { trim_body } = require("request_trimmer");
 // swagger related configs
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yaml");
-const file = fs.readFileSync(
-	path.join(__dirname, "./", "documentation.yaml"),
-	"utf8"
-);
+const file = fs.readFileSync(path.join(__dirname, "../", "docs.yaml"), "utf8");
 const swaggerDocument = YAML.parse(file);
 const options = {
 	customCss: ".swagger-ui .topbar { display: none }",
