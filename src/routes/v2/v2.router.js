@@ -1,10 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 
-const {
-	httpGetIndividualRes,
-	httpGetApplicationRes,
-} = require("./v2.controller");
+const { httpGetIndividualRes, httpGetBatchRes } = require("./v2.controller");
 const { multerStorageConfig } = require("../../utils/multerConfig");
 
 const v2Router = express.Router(); // create a express router
@@ -23,6 +20,6 @@ v2Router.post(
 );
 
 // making batch request based on application requests, not handling file uploads
-v2Router.post("/batch", httpGetApplicationRes);
+v2Router.post("/batch", httpGetBatchRes);
 
 module.exports = v2Router;

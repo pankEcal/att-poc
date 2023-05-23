@@ -437,7 +437,7 @@ async function makeHttpReq(request) {
 	return await handlePlainReq(request);
 }
 
-async function makeBatchAppHttpReq(request) {
+async function makeBatchHttpReq(request) {
 	// const data = getApplicationData();
 	const { data } = await handleBatchApplicationReq(request);
 
@@ -447,4 +447,4 @@ async function makeBatchAppHttpReq(request) {
 	};
 }
 
-module.exports = { makeHttpReq, makeBatchAppHttpReq };
+module.exports = { makeHttpReq, makeBatchHttpReq };

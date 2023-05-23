@@ -1,4 +1,4 @@
-const { makeHttpReq, makeBatchAppHttpReq } = require("../../utils/makeHttpReq");
+const { makeHttpReq, makeBatchHttpReq } = require("../../utils/makeHttpReq");
 
 // method to make POST request to server and give response back
 async function httpGetIndividualRes(req, res) {
@@ -19,10 +19,10 @@ async function httpGetIndividualRes(req, res) {
 }
 
 // method to make POST request to server and give response back based on application
-async function httpGetApplicationRes(req, res) {
-	const { data, status } = await makeBatchAppHttpReq(req);
+async function httpGetBatchRes(req, res) {
+	const { data, status } = await makeBatchHttpReq(req);
 
 	return res.status(status).json(data);
 }
 
-module.exports = { httpGetIndividualRes, httpGetApplicationRes };
+module.exports = { httpGetIndividualRes, httpGetBatchRes };
