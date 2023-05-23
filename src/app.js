@@ -1,7 +1,18 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const { trim_body } = require("request_trimmer");
+
+// swagger related configs
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yaml");
+const file = fs.readFileSync(
+	path.join(__dirname, "./", "documentation.yaml"),
+	"utf8"
+);
+const swaggerDocument = YAML.parse(file);
 
 const fileUploadRouter = require("./routes/fileupload/fileUpload.router");
 const dailyMoniterRouter = require("./routes/dailymonitor/dailymonitor.router");
@@ -23,6 +34,7 @@ app.use(trim_body);
 app.use("/fileupload", fileUploadRouter);
 app.use("/dailymonitor", dailyMoniterRouter);
 app.use("/hardcoded", hardcodedRequestsRoute);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/", (req, res) => {
 	return res.status(200).json({

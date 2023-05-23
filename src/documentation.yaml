@@ -1,0 +1,5 @@
+openapi: 3.0.0
+info:
+  title: ATT Backend API
+  description: Documentation about all the realted routes of the ATT Backend
+  version: 1.0.0
