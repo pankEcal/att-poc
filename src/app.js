@@ -13,6 +13,9 @@ const file = fs.readFileSync(
 	"utf8"
 );
 const swaggerDocument = YAML.parse(file);
+const options = {
+	customCss: ".swagger-ui .topbar { display: none }",
+};
 
 const fileUploadRouter = require("./routes/fileupload/fileUpload.router");
 const dailyMoniterRouter = require("./routes/dailymonitor/dailymonitor.router");
@@ -34,7 +37,11 @@ app.use(trim_body);
 app.use("/fileupload", fileUploadRouter);
 app.use("/dailymonitor", dailyMoniterRouter);
 app.use("/hardcoded", hardcodedRequestsRoute);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use(
+	"/api-docs",
+	swaggerUi.serve,
+	swaggerUi.setup(swaggerDocument, options)
+);
 
 app.get("/", (req, res) => {
 	return res.status(200).json({
