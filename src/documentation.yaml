@@ -3,3 +3,24 @@ info:
   title: ATT Backend API
   description: Documentation about all the realted routes of the ATT Backend
   version: 1.0.0
+servers:
+  - url: http://localhost:8000/
+    description: Local development server for the ATT
+paths:
+  /:
+    get:
+      summary: homepage
+      responses:
+        "200": # status code
+          description: will respond with status and message fields
+          content:
+            text/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Hi, I'm ATT. Please follow documentation to get more info
