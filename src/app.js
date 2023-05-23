@@ -19,7 +19,7 @@ const options = {
 
 const fileUploadRouter = require("./routes/fileupload/fileUpload.router");
 const dailyMoniterRouter = require("./routes/dailymonitor/dailymonitor.router");
-const hardcodedRequestsRoute = require("./routes/hardcoded/hardcoded.router");
+const v2Router = require("./routes/v2/v2.router");
 
 // defining CORS parameters
 let corsOptions = {
@@ -36,7 +36,7 @@ app.use(trim_body);
 /* Implementing dedicated routes */
 app.use("/fileupload", fileUploadRouter);
 app.use("/dailymonitor", dailyMoniterRouter);
-app.use("/hardcoded", hardcodedRequestsRoute);
+app.use("/v2/test", v2Router);
 app.use(
 	"/api-docs",
 	swaggerUi.serve,
