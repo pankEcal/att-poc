@@ -120,3 +120,7 @@ paths:
           schema:
             type: boolean
             example: true
+
+      responses:
+        200:
+          description: test passed, gives back response with fields **testResult**, **serverResponse**, and **validationMessage**
