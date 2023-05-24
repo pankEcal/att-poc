@@ -182,3 +182,8 @@ paths:
                   message:
                     type: string
                     example: "user logged in successfully"
+      responses:
+        200:
+          description: test passed, gives back response with fields **testResult**, **serverResponse**, and **validationMessage**
+        400:
+          description: test failed, gives back response with fields **testResult**. Relevant message is inculded inside of the field
