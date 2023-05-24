@@ -24,3 +24,65 @@ paths:
                   message:
                     type: string
                     example: Hi, I'm ATT. Please follow documentation to get more info
+
+  /v2/test:
+    post:
+      summary: sends request to the provided URL and gives back the response
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: baseUrl
+          description: baseUrl of the API to test
+          schema:
+            type: string
+            properties:
+              baseUrl:
+                type: string
+                example: "https://evaai.enginecal.com/"
+        - in: body
+          name: apiLink
+          description: part of the API after base URL
+          schema:
+            type: string
+            properties:
+              apiLink:
+                type: string
+                example: "core/v1/bike-intell/checklogin"
+        - in: body
+          name: requestMethod
+          description: type of the request to make to the API. Only **GET** or **POST** is a valid option
+          schema:
+            type: string
+            properties:
+              requestMethod:
+                type: string
+                example: "POST"
+        - in: body
+          name: requestParams
+          description: field which consists all the required parameters to make valid request to the API
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: "saurabh"
+              password:
+                type: string
+                example: "123456"
+        - in: body
+          name: validationParams
+          description: field which consists all the required parameters to validate the server response received from server side of the tested API. If the field is missing or empty, then validation check will be skipped.
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: user loggedin successfully
+
+      responses:
+        200:
+          description: test passed, gives back response with fields **testResult**, **serverResponse**, and **validationMessage**
