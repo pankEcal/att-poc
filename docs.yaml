@@ -128,3 +128,57 @@ paths:
           description: test passed, gives back response with fields **testResult**, **serverResponse**, and **validationMessage**
         400:
           description: test failed, gives back response with fields **testResult**. Relevant message is inculded inside of the field
+
+  /v2/test/batch/application:
+    post:
+      summary: performs batch test requests and sends back the collective data
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: applicationName
+          description: name of the application whose APIs are being tested
+          schema:
+            type: string
+            example: "Bike Intell"
+
+        - in: body
+          name: baseUrl
+          description: baseUrl of the application whose APIs are being tested
+          schema:
+            type: string
+            example: "https://evaai.enginecal.com/"
+
+        - in: body
+          name: apis
+          description: list of apis to perform tests and all the required data
+          schema:
+            type: array
+            properties:
+              applicationName:
+                type: string
+                example: "User Login Check"
+              apiLink:
+                type: string
+                example: "core/v1/bike-intell/checklogin"
+              requestMethod:
+                type: string
+                example: "POST"
+              requestParams:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    example: "saurabh"
+                  password:
+                    type: string
+                    example: "123456"
+              validationParams:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "user logged in successfully"
