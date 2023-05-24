@@ -36,28 +36,19 @@ paths:
           description: baseUrl of the API to test
           schema:
             type: string
-            properties:
-              baseUrl:
-                type: string
-                example: "https://evaai.enginecal.com/"
+            example: "https://evaai.enginecal.com/"
         - in: body
           name: apiLink
           description: part of the API after base URL
           schema:
             type: string
-            properties:
-              apiLink:
-                type: string
-                example: "core/v1/bike-intell/checklogin"
+            example: "core/v1/bike-intell/checklogin"
         - in: body
           name: requestMethod
           description: type of the request to make to the API. Only **GET** or **POST** is a valid option
           schema:
             type: string
-            properties:
-              requestMethod:
-                type: string
-                example: "POST"
+            example: "POST"
         - in: body
           name: requestParams
           description: field which consists all the required parameters to make valid request to the API
