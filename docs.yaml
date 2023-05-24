@@ -86,6 +86,8 @@ paths:
       responses:
         200:
           description: test passed, gives back response with fields **testResult**, **serverResponse**, and **validationMessage**
+        400:
+          description: test failed, gives back response with fields **testResult**. Relevant message is inculded inside of the field
 
   /v2/test/fileupload:
     post:
@@ -124,3 +126,5 @@ paths:
       responses:
         200:
           description: test passed, gives back response with fields **testResult**, **serverResponse**, and **validationMessage**
+        400:
+          description: test failed, gives back response with fields **testResult**. Relevant message is inculded inside of the field
