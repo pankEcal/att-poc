@@ -86,3 +86,37 @@ paths:
       responses:
         200:
           description: test passed, gives back response with fields **testResult**, **serverResponse**, and **validationMessage**
+
+  /v2/test/fileupload:
+    post:
+      summary: sends file upload requests to the provided URL and gives back the response
+      consumes:
+        - formData
+      parameters:
+        - in: formData
+          name: baseUrl
+          description: baseUrl of the API to test
+          schema:
+            type: string
+            example: "https://evaai.enginecal.com/"
+
+        - in: formData
+          name: apiLink
+          description: part of the API after base URL
+          schema:
+            type: string
+            example: "core/v1/bike-intell/checklogin"
+
+        - in: formData
+          name: csvfile
+          description: part of the API after base URL
+          schema:
+            type: file
+            example: "csvfile.csv"
+
+        - in: formData
+          name: validationParams
+          description: other fields than the fields mentioned above will be the part of the validationParams
+          schema:
+            type: boolean
+            example: true
