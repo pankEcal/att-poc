@@ -141,7 +141,7 @@ paths:
           name: apis
           description: list of apis to perform tests and all the required data
           schema:
-            type: array
+            type: object
             properties:
               applicationName:
                 type: string
