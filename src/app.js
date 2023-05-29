@@ -41,10 +41,12 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-	return res.status(200).json({
-		status: "running",
-		message: "Hi, I'm ATT. Please follow documentation to get more info",
-	});
+	res.redirect("/api-docs");
+
+	// return res.status(200).json({
+	// 	status: "running",
+	// 	message: "Hi, I'm ATT. Please follow documentation to get more info",
+	// });
 });
 
 module.exports = app;

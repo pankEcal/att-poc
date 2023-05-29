@@ -12,18 +12,8 @@ paths:
       summary: homepage
       responses:
         "200": # status code
-          description: will respond with status and message fields
+          description: will redirect to the `/api-docs` page
           content:
-            text/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Hi, I'm ATT. Please follow documentation to get more info
 
   /v2/test:
     post:
