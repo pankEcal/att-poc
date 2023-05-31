@@ -271,7 +271,10 @@ async function handlePlainReq(request) {
 			status: status ?? 400,
 			message: validationMessage.validated
 				? validationMessage.message
-				: data.message || data.successMessage || data.errorMessage,
+				: data.message ||
+				  data.successMessage ||
+				  data.errorMessage ||
+				  "message field missing in server response",
 		};
 
 		// return response back to the calling method
