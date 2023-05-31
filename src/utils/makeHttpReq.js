@@ -373,7 +373,7 @@ async function handleBatchApplicationReq(request) {
 
 		// updating response object to add time taken to execute tests
 		Object.assign(data.testResult, {
-			testDuration: `${Date.now() - individualStartingTime} ms`,
+			testDuration: `${(Date.now() - individualStartingTime) / 1000} s`,
 		});
 
 		testData.push(data);
@@ -382,7 +382,7 @@ async function handleBatchApplicationReq(request) {
 	return {
 		data: {
 			applicationName,
-			testDuration: `${Date.now() - batchStartingTime} ms`,
+			testDuration: `${(Date.now() - batchStartingTime) / 1000} s`,
 			apisTested: testData.length,
 			testData,
 		},

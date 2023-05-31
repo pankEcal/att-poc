@@ -81,7 +81,8 @@ async function getBatchHttpResponse(responseBody) {
 				serverStatus: data.status,
 				serverMessage: data.message,
 			};
-			const individualReqTimeTaken = Date.now() - individualReqStartTime;
+			const individualReqTimeTaken =
+				(Date.now() - individualReqStartTime) / 1000;
 
 			let serverResponse = isExpectedErrorMessage(
 				userReqValues,
@@ -92,7 +93,7 @@ async function getBatchHttpResponse(responseBody) {
 						testType: "batch url request",
 						message: "user input and server response matched",
 						application: application,
-						testDuration: `${individualReqTimeTaken} ms`,
+						testDuration: `${individualReqTimeTaken} s`,
 						url: responseUrl,
 						method: method,
 						serverResponse: {
@@ -119,10 +120,10 @@ async function getBatchHttpResponse(responseBody) {
 		}
 	}
 
-	const batchReqTimeTaken = Date.now() - batchReqStartTime;
+	const batchReqTimeTaken = (Date.now() - batchReqStartTime) / 1000;
 
 	return {
-		totalTestDuration: `${batchReqTimeTaken} ms`,
+		totalTestDuration: `${batchReqTimeTaken} s`,
 		apisTested: serverResponses.length,
 		data: serverResponses,
 	};
@@ -180,7 +181,8 @@ async function getApplicationRespose(app) {
 				serverMessage: data.message,
 			};
 
-			const individualReqTimeTaken = Date.now() - individualReqStartTime;
+			const individualReqTimeTaken =
+				(Date.now() - individualReqStartTime) / 1000;
 
 			let serverResponse = isExpectedErrorMessage(
 				userReqValues,
@@ -191,7 +193,7 @@ async function getApplicationRespose(app) {
 						testType: "application urls batch request",
 						message: "user input and server response matched !",
 						application: application,
-						testDuration: `${individualReqTimeTaken} ms`,
+						testDuration: `${individualReqTimeTaken} s`,
 						url: responseUrl,
 						method: method,
 						serverResponse: {
@@ -217,12 +219,12 @@ async function getApplicationRespose(app) {
 			serverResponses.push(serverResponse);
 		}
 	}
-	const batchReqTimeTaken = Date.now() - batchReqStartTime;
+	const batchReqTimeTaken = (Date.now() - batchReqStartTime) / 1000;
 
 	return {
 		application: application,
 		apisTested: serverResponses.length,
-		totalTestDuration: `${batchReqTimeTaken} ms`,
+		totalTestDuration: `${batchReqTimeTaken} s`,
 		data: serverResponses,
 	};
 }
@@ -289,7 +291,7 @@ async function httpGetServerResponse(req, res) {
 			serverMessage: data.message,
 		};
 
-		const timeTaken = Date.now() - startTime;
+		const timeTaken = (Date.now() - startTime) / 1000;
 
 		// return responses based on user requested values and server response values comparasion validation
 		return isExpectedErrorMessage(userReqValues, serverResMessage)
@@ -297,7 +299,7 @@ async function httpGetServerResponse(req, res) {
 					testStatus: "passed",
 					testType: "individual url request",
 					message: "user input and server response matched",
-					testDuration: `${timeTaken} ms`,
+					testDuration: `${timeTaken} s`,
 					url: responseUrl,
 					method: method,
 					serverResponse: {

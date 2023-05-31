@@ -10,7 +10,7 @@ async function httpGetIndividualRes(req, res) {
 
 	// updating response object to add time taken to execute tests
 	Object.assign(data.testResult, {
-		testDuration: `${Date.now() - startingTime} ms`,
+		testDuration: `${(Date.now() - startingTime) / 1000} s`,
 	});
 
 	return res.status(status).json({

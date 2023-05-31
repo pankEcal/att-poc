@@ -75,12 +75,12 @@ async function makePostReq(uploadUrl, csvfile, deviceId) {
 			data,
 		} = fileUploadResponse;
 
-		const fileUploadTimeTaken = Date.now() - fileUploadStartTime;
+		const fileUploadTimeTaken = (Date.now() - fileUploadStartTime) / 1000;
 
 		let responseData = {
 			testStatus: "passed",
 			testType: "file upload",
-			testDuration: `${fileUploadTimeTaken} ms`,
+			testDuration: `${fileUploadTimeTaken} s`,
 			url: responseUrl,
 			method: method,
 			date: date,
