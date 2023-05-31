@@ -242,7 +242,7 @@ async function handlePlainReq(request) {
 			Object.assign(serverResponse, response); // update responsedata to be sent after making request
 		} else if (requestMethod.toUpperCase() === "POST") {
 			// make HTTP request and get response back
-			response = await axios.post(baseUrl + apiLink, requestParams, {
+			const response = await axios.post(baseUrl + apiLink, requestParams, {
 				headers: { "Content-Type": "application/json" },
 			});
 			Object.assign(serverResponse, response); // update responsedata to be sent after making request
