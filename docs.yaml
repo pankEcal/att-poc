@@ -107,7 +107,7 @@ paths:
         400:
           description: test failed, gives back response with fields **testResult**. Relevant message is inculded inside of the field
 
-  /v2/test/batch/application:
+  /v2/test/batch:
     post:
       summary: performs batch test requests and sends back the collective data
       consumes:
