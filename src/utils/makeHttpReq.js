@@ -259,7 +259,8 @@ async function handlePlainReq(request) {
 		// if validation param is passed then it will validate it and give success status based on validation which will be testResult success status.
 		// if validation param isn't passed then test result will be thrown based on server response.
 		const isPassingServerResponse =
-			status === 200 && (data.success === true || data.status === true);
+			(status === 200 || status === 201) &&
+			(data.success === true || data.status === true);
 		const teststatus = validationMessage.validated
 			? validationMessage.success
 			: isPassingServerResponse;
