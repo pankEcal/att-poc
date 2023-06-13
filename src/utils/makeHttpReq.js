@@ -22,6 +22,9 @@ function handleError(error) {
 			message: message ? message : null,
 			status,
 		},
+		serverResponse: {
+			...error.response.data,
+		},
 		error,
 	};
 
