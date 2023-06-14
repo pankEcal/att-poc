@@ -247,6 +247,7 @@ async function handlePlainReq(request) {
 			const response = await axios.get(baseUrl + apiLink); // make HTTP request and get response back
 			Object.assign(serverResponse, response); // update responsedata to be sent after making request
 		} else if (requestMethod.toUpperCase() === "POST") {
+			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
 			// make HTTP request and get response back
 			const response = await axios.post(baseUrl + apiLink, requestParams, {
 				headers: { "Content-Type": "application/json" },
