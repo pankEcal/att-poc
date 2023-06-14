@@ -9,7 +9,7 @@ servers:
 paths:
   /:
     get:
-      summary: homepage
+      summary: shows documentation for the backend application
       responses:
         "200": # status code
           description: will redirect to the `/api-docs` page
