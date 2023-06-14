@@ -203,6 +203,7 @@ async function handlePlainReq(request) {
 				requestParams,
 				validationParams,
 			},
+			headers,
 		} = request;
 
 		// validate request method
@@ -250,7 +251,10 @@ async function handlePlainReq(request) {
 			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
 			// make HTTP request and get response back
 			const response = await axios.post(baseUrl + apiLink, requestParams, {
-				headers: { "Content-Type": "application/json" },
+				headers: {
+					"Content-Type": "application/json",
+					authorization: headers.authorization ? headers.authorization : null,
+				},
 			});
 			Object.assign(serverResponse, response); // update responsedata to be sent after making request
 		}
