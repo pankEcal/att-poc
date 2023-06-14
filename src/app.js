@@ -40,13 +40,8 @@ app.use(
 	swaggerUi.setup(swaggerDocument, options)
 );
 
-app.get("/", (req, res) => {
+app.all("*", (req, res) => {
 	res.redirect("/api-docs");
-
-	// return res.status(200).json({
-	// 	status: "running",
-	// 	message: "Hi, I'm ATT. Please follow documentation to get more info",
-	// });
 });
 
 module.exports = app;
