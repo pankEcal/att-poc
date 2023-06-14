@@ -14,7 +14,7 @@ function handleError(error) {
 		message: axiosErrorMessage,
 	} = error;
 
-	const data = {
+	const errorResponseData = {
 		testResult: {
 			url: url,
 			success: false,
@@ -31,7 +31,7 @@ function handleError(error) {
 		error,
 	};
 
-	return { data, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
+	return { data: errorResponseData, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
 }
 
 // handle file upload requests
