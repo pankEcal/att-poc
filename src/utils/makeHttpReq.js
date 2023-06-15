@@ -24,7 +24,7 @@ function handleError(error) {
 			status,
 		},
 		serverResponse:
-			status === 404
+			typeof severResponseData === "string"
 				? { message: severResponseData }
 				: {
 						...severResponseData,
