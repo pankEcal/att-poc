@@ -252,7 +252,7 @@ async function handlePlainReq(request) {
 			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
 			// make HTTP request and get response back
 			const response = await axios.post(
-				`${baseUrl}${apiLink}?${queryParams}`,
+				`${baseUrl}${apiLink}${queryParams.length ? "?" + queryParams : ""}`,
 				requestParams,
 				{
 					headers: {
@@ -265,7 +265,11 @@ async function handlePlainReq(request) {
 		}
 
 		// get server response after making HTTP requst to the provided URL
-		const { data, status } = serverResponse;
+		const {
+			data,
+			status,
+			config: { url: requestedUrl = baseUrl + apiLink },
+		} = serverResponse;
 		// perform validation and get validation message if server responded with data
 		if (data) {
 			validationMessage = validateServerRes(validationParams, data);
@@ -282,7 +286,7 @@ async function handlePlainReq(request) {
 			: isPassingServerResponse;
 
 		const testResult = {
-			url: baseUrl + apiLink,
+			url: requestedUrl,
 			success: teststatus,
 			method: request.method,
 			status: status ?? 400,
