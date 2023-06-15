@@ -20,7 +20,10 @@ function handleError(error) {
 			url: url,
 			success: false,
 			method: method,
-			message: axiosErrorMessage ? axiosErrorMessage : null,
+			message:
+				severResponseData.message || severResponseData.successMessage
+					? severResponseData.message || severResponseData.successMessage
+					: axiosErrorMessage,
 			status,
 		},
 		serverResponse:
