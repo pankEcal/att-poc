@@ -202,6 +202,7 @@ async function handlePlainReq(request) {
 				requestMethod = undefined,
 				requestParams,
 				validationParams,
+				queryParams = {},
 			},
 			headers,
 		} = request;
@@ -250,12 +251,16 @@ async function handlePlainReq(request) {
 		} else if (requestMethod.toUpperCase() === "POST") {
 			process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
 			// make HTTP request and get response back
-			const response = await axios.post(baseUrl + apiLink, requestParams, {
-				headers: {
-					"Content-Type": "application/json",
-					authorization: headers.authorization ? headers.authorization : null,
-				},
-			});
+			const response = await axios.post(
+				`${baseUrl}${apiLink}?${queryParams}`,
+				requestParams,
+				{
+					headers: {
+						"Content-Type": "application/json",
+						authorization: headers.authorization ? headers.authorization : null,
+					},
+				}
+			);
 			Object.assign(serverResponse, response); // update responsedata to be sent after making request
 		}
 
@@ -371,8 +376,14 @@ async function handleBatchApplicationReq(request) {
 		// record starting time before running test to track the total time taken
 		const individualStartingTime = Date.now();
 
-		const { apiLink, requestMethod, requestParams, validationParams, apiName } =
-			apis[i];
+		const {
+			apiLink,
+			requestMethod,
+			requestParams,
+			validationParams,
+			apiName,
+			queryParams = {},
+		} = apis[i];
 
 		const request = {
 			body: {
@@ -381,6 +392,7 @@ async function handleBatchApplicationReq(request) {
 				requestMethod,
 				requestParams,
 				validationParams,
+				queryParams,
 			},
 			headers,
 		};
