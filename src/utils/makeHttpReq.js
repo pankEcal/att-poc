@@ -306,6 +306,7 @@ async function handleBatchApplicationReq(request) {
 
 	const {
 		body: { applicationName, baseUrl, apis },
+		headers,
 	} = request;
 
 	// validate if request body. If it's empty then throw relevant response and don't proceed for any requests
@@ -381,6 +382,7 @@ async function handleBatchApplicationReq(request) {
 				requestParams,
 				validationParams,
 			},
+			headers,
 		};
 
 		const { data } = await handlePlainReq(request);
