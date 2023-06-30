@@ -42,6 +42,7 @@ function handleError(error) {
 async function handleFileUploadReq(request) {
 	const {
 		body: { baseUrl, apiLink },
+		file,
 	} = request;
 
 	// validate if request body. If it's empty then throw relevant response and don't proceed for any requests
@@ -70,6 +71,18 @@ async function handleFileUploadReq(request) {
 			data,
 			status: 400,
 		};
+	}
+
+	// validate if file is uploaded or not
+	if (!file) {
+		const data = {
+			testResult: {
+				success: false,
+				message: "Missing file to upload",
+				status: 400,
+			},
+		};
+		return { data, status: 400 };
 	}
 
 	try {
@@ -465,11 +478,6 @@ const getApplicationData = () => {
 
 // main function to handle a HTTP request
 async function makeHttpReq(request) {
-	// handle file uploading request
-	if (request.file) {
-		return await handleFileUploadReq(request);
-	}
-
 	// hanlde non file uploading request
 	return await handlePlainReq(request);
 }
@@ -484,4 +492,4 @@ async function makeBatchHttpReq(request) {
 	};
 }
 
-module.exports = { makeHttpReq, makeBatchHttpReq };
+module.exports = { makeHttpReq, makeBatchHttpReq, handleFileUploadReq };
