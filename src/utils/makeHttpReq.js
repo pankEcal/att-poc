@@ -130,6 +130,8 @@ async function handleFileUploadReq(request) {
 			formDataInput.append(key, requestParams[key]);
 		}
 
+		process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // hotfix to avoid "unable to verify the first certificate" warning on https requests by not verifying that the SSL/TLS certificates
+
 		// if  baseUrl and apiLink fields are non-empty then make POST request with the created formData
 		serverResponse = await axios.post(baseUrl + apiLink, formDataInput, {
 			headers: {
