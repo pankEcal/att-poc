@@ -2,8 +2,8 @@ const express = require("express");
 const multer = require("multer");
 
 const {
-	httpGetRoutes,
-	handlefilupload,
+  httpGetRoutes,
+  handlefilupload,
 } = require("../fileupload/fileUpload.controller");
 const { multerStorageConfig } = require("../../utils/multerConfig");
 

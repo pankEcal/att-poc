@@ -11,7 +11,7 @@ const YAML = require("yaml");
 const file = fs.readFileSync(path.join(__dirname, "../", "docs.yaml"), "utf8");
 const swaggerDocument = YAML.parse(file);
 const options = {
-	customCss: ".swagger-ui .topbar { display: none }",
+  customCss: ".swagger-ui .topbar { display: none }",
 };
 
 const fileUploadRouter = require("./routes/fileupload/fileUpload.router");
@@ -20,7 +20,7 @@ const v2Router = require("./routes/v2/v2.router");
 
 // defining CORS parameters
 let corsOptions = {
-	origin: "*",
+  origin: "*",
 };
 
 const app = express();
@@ -35,13 +35,13 @@ app.use("/fileupload", fileUploadRouter);
 app.use("/dailymonitor", dailyMoniterRouter);
 app.use("/v2/test", v2Router);
 app.use(
-	"/api-docs",
-	swaggerUi.serve,
-	swaggerUi.setup(swaggerDocument, options)
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, options),
 );
 
 app.all("*", (req, res) => {
-	res.redirect("/api-docs");
+  res.redirect("/api-docs");
 });
 
 module.exports = app;

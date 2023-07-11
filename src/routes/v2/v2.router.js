@@ -2,9 +2,9 @@ const express = require("express");
 const multer = require("multer");
 
 const {
-	httpGetIndividualRes,
-	httpGetBatchRes,
-	httpGetFileUploadRes,
+  httpGetIndividualRes,
+  httpGetBatchRes,
+  httpGetFileUploadRes,
 } = require("./v2.controller");
 const { multerStorageConfig } = require("../../utils/multerConfig");
 
@@ -18,9 +18,9 @@ v2Router.post("/", httpGetIndividualRes);
 
 // handle individual URL requests
 v2Router.post(
-	"/fileupload",
-	upload.single("csvfile"), // in req.file it will have key "csvfile" which points to the uploaded file
-	httpGetFileUploadRes
+  "/fileupload",
+  upload.single("csvfile"), // in req.file it will have key "csvfile" which points to the uploaded file
+  httpGetFileUploadRes,
 );
 
 // making batch request based on application requests, not handling file uploads

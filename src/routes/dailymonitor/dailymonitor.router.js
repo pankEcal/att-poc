@@ -3,10 +3,10 @@ const multer = require("multer");
 const upload = multer();
 
 const {
-	httpGetDailyMonitorApis,
-	httpGetServerResponse,
-	httpGetBatchServerResponse,
-	httpGetBatchApplicationResponse,
+  httpGetDailyMonitorApis,
+  httpGetServerResponse,
+  httpGetBatchServerResponse,
+  httpGetBatchApplicationResponse,
 } = require("./dailymonitor.controller");
 
 const dailyMonitorRouter = express.Router();
@@ -18,9 +18,9 @@ dailyMonitorRouter.get("/apis", httpGetDailyMonitorApis);
 dailyMonitorRouter.post("/", upload.none(), httpGetServerResponse);
 dailyMonitorRouter.post("/batch", upload.none(), httpGetBatchServerResponse);
 dailyMonitorRouter.post(
-	"/application",
-	upload.none(),
-	httpGetBatchApplicationResponse
+  "/application",
+  upload.none(),
+  httpGetBatchApplicationResponse,
 );
 
 module.exports = dailyMonitorRouter;
