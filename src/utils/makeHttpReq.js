@@ -8,12 +8,20 @@ const { validateServerRes } = require("../utils/validateServerRes");
 function handleError(error) {
   // if error is occured then pass the message and status codes accordingly
   const {
+    name,
+    code,
     response: { status } = {}, // if response.status === undefined, in that case assign it as an empty object
     config: { url } = {}, // if response.config === undefined, in that case assign it as an empty object
     request: { method } = {}, // if response.request === undefined, in that case assign it as an empty object
     message: axiosErrorMessage,
     response: { data: severResponseData = {} },
   } = error;
+
+  const errorResponse = {
+    status,
+    code,
+    message: axiosErrorMessage,
+  };
 
   const errorResponseData = {
     testResult: {
@@ -32,7 +40,7 @@ function handleError(error) {
         : {
             ...severResponseData,
           },
-    error,
+    error: errorResponse,
   };
 
   return { data: errorResponseData, status: status ?? 400 }; // if status value is not coming from error, pass 400 as default
@@ -278,7 +286,7 @@ async function handlePlainReq(request) {
             "Content-Type": "application/json",
             authorization: headers.authorization ? headers.authorization : null,
           },
-        },
+        }
       );
       Object.assign(serverResponse, response); // update responsedata to be sent after making request
     }
