@@ -14,7 +14,11 @@ function handleError(error) {
     config: { url } = {}, // if response.config === undefined, in that case assign it as an empty object
     request: { method } = {}, // if response.request === undefined, in that case assign it as an empty object
     message: axiosErrorMessage,
-    response: { data: severResponseData = {} },
+    response: {
+      datas: severResponseData = {
+        message: "generic message. some error occured!!",
+      },
+    },
   } = error;
 
   const errorResponse = {
@@ -29,7 +33,7 @@ function handleError(error) {
       success: false,
       method: method,
       message:
-        severResponseData.message || severResponseData.successMessage
+        severResponseData?.message || severResponseData?.successMessage
           ? severResponseData.message || severResponseData.successMessage
           : axiosErrorMessage,
       status,
